@@ -1,3 +1,6 @@
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+WORKDIR /app
+
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
@@ -11,12 +14,11 @@ RUN dotnet restore "src/Host/Host.csproj"
 COPY . .
 WORKDIR "/src/src/Host"
 
-RUN dotnet build "Host.csproj" -c Release -o /app/build
+RUN dotnet publish "Host.csproj" -c Release --no-restore -o /app/publish
 
-FROM build AS publish
-RUN dotnet publish "Host.csproj" -c Release -o /app/publish
+FROM base AS final
+WORKDIR /app
 
-FROM nginx:alpine AS final
-WORKDIR /usr/share/nginx/html
-COPY --from=publish /app/publish/wwwroot .
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "rmsweb.Host.dll"]
