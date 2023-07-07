@@ -42,15 +42,22 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             # Stop existing container
-            docker container stop rmsweb-prod || true
+            docker container stop rmsweb-prod
             
             # Remove existing container
             docker container prune -f
             
             # Remove existing image
-            docker image rm adyemisworld/rmsweb:latest -f || true
+            docker image rm adyemisworld/rmsweb:latest -f
             docker system prune -f
       
             docker run -d --name rmsweb-prod --network tajneednetwork adyemisworld/rmsweb
+            
+            docker run -d --name maan-nginx --network tajneednetwork \
+              -p 80:80 -p 443:443 \
+              -v /etc/ssl/certs:/etc/ssl/certs \
+              -v /etc/ssl/private:/etc/ssl/private \
+              -v /etc/nginx:/etc/nginx \
+              nginx:alpine
             
             docker image prune -f
