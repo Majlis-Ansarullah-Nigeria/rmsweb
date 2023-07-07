@@ -1,0 +1,41 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.DependencyInjection
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
+@using rmsweb.Client
+@using rmsweb.Client.Shared
+@using rmsweb.Client.Pages.Authentication
+@using rmsweb.Client.Pages.Multitenancy
+@using rmsweb.Client.Components.Common
+@using rmsweb.Client.Components.EntityTable
+@using rmsweb.Client.Components.Localization
+@using rmsweb.Client.Components.Notifications
+@using rmsweb.Client.Components.ThemeManager
+@using rmsweb.Client.Infrastructure.ApiClient
+@using rmsweb.Client.Infrastructure.Auth
+@using rmsweb.Client.Infrastructure.Common
+@using rmsweb.Client.Infrastructure.Notifications
+@using rmsweb.Client.Infrastructure.Preferences
+@using FSH.WebApi.Shared.Authorization
+@using Blazored.LocalStorage
+@using Mapster
+@using MediatR.Courier
+@using MudBlazor
+
+@attribute [Authorize]
+
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IConfiguration Config
+@inject IClientPreferenceManager ClientPreferences
