@@ -8,45 +8,83 @@
     <base href="/" />
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
-    <!-- This file is only needed (and apparently also only generated) if there are any Page or Component specific styles used. -->
-    <!--<link href="rmsweb.Client.styles.css" rel="stylesheet" />-->
     <link href="css/fsh.css" rel="stylesheet" />
     <link href="manifest.json" rel="manifest" />
     <link rel="apple-touch-icon" sizes="512x512" href="full-stack-hero-logo.jpg" />
     <link rel="apple-touch-icon" sizes="192x192" href="full-stack-hero-logo.jpg" />
+    <style>
+        @keyframes slide {
+            0% {
+                transform: translateX(-50%);
+            }
+
+            100% {
+                transform: translateX(50%);
+            }
+        }
+
+        .fsh-wasm {
+            animation: slide 3s ease-in-out infinite alternate;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(-120deg, #3eaf7c 50%, #ffffff 50%);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .fsh-wasm-cont {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        #logo {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            height: 200px;
+            width: 200px;
+            z-index: 1;
+        }
+
+        #loading-text {
+            font-size: 32px;
+            font-family: 'Montserrat', sans-serif;
+            color: #3eaf7c;
+            margin-top: 40px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+
+
 </head>
 
 <body>
     <div id="app">
+        <img id="logo" src="/full-stack-hero-logo.jpg" alt="Logo" />
+
         <style>
-            @keyframes slide {
-                0% {
-                    transform: translateX(-25%);
-                }
-
-                100% {
-                    transform: translateX(25%);
-                }
-            }
-
-            .fsh-wasm {
-                animation: slide 3s ease-in-out infinite alternate;
-                bottom: 0;
-                left: -50%;
-                opacity: .5;
-                position: fixed;
-                right: -50%;
-                top: 0;
-                z-index: -1
-            }
-
             .fsh-wasm-cont {
-                left: 50%;
-                padding: 10vmin;
-                position: fixed;
-                text-align: center;
-                top: 50%;
-                transform: translate(-50%, -50%)
+                padding-top: 250px;
             }
         </style>
 
@@ -54,8 +92,8 @@
             <div class="fsh-wasm"></div>
             <div class="fsh-wasm" style="animation-direction:alternate-reverse;animation-duration:2s;"></div>
             <div class="fsh-wasm" style="animation-duration:5s;"></div>
-            <div class="fsh-wasm-cont ">
-                <img src="/full-stack-hero-logo.jpg" Style="height:350px; width:350px; opacity:0.8" />
+            <div class="fsh-wasm-cont">
+                <div id="loading-text">Loading Report Management Portal...</div>
             </div>
         </div>
     </div>
