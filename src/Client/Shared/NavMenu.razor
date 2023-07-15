@@ -18,9 +18,19 @@
     <MudNavLink Href="/audit-logs" Icon="@Icons.Material.Filled.SecurityUpdateGood">@L["Logs"]</MudNavLink>
     @if (_canViewProducts || _canViewBrands)
     {
+        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 my-3">@L["Reports"]</MudText>
+        @if (_canViewProducts)
+        {
+            <MudNavLink Href="/report-submission" Icon="@Icons.Filled.Report" Class="fsh-nav-child">
+                @L["Report Submission"]
+            </MudNavLink>
+        }
+    }
+    @if (_canViewProducts || _canViewBrands)
+    {
         <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 my-3">@L["Management"]</MudText>
         <MudNavGroup Title="@L["Reports"]" Expanded Icon="@Icons.Filled.AddBox">
-            @if (_canViewProducts)
+        @if (_canViewProducts)
             {
                 <MudNavLink Href="/report/types" Icon="@Icons.Filled.Report" Class="fsh-nav-child">
                     @L["Report Types"]
