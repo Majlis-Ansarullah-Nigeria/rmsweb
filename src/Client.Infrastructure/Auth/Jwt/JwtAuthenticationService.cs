@@ -48,7 +48,7 @@ public class JwtAuthenticationService : AuthenticationStateProvider, IAuthentica
 
     public async Task<bool> LoginAsync(string tenantId, TokenRequest request)
     {
-        var tokenResponse = await _tokensClient.GetTokenAsync(tenantId, request);
+        var tokenResponse = await _tokensClient.GetTokenAsync(request);
 
         string? token = tokenResponse.Token;
         string? refreshToken = tokenResponse.RefreshToken;
@@ -135,13 +135,13 @@ public class JwtAuthenticationService : AuthenticationStateProvider, IAuthentica
 
         try
         {
-            var tokenResponse = await _tokensClient.RefreshAsync(tenantKey, request);
+            var tokenResponse = await _tokensClient.RefreshAsync(request);
 
             await CacheAuthTokens(tokenResponse.Token, tokenResponse.RefreshToken);
 
             return (true, tokenResponse);
         }
-        catch (ApiException<ErrorResult>)
+        catch (Exception ex)
         {
             return (false, null);
         }

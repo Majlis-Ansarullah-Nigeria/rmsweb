@@ -1,4 +1,4 @@
-using Mapster;
+/*using Mapster;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using rmsweb.Client.Components.EntityTable;
@@ -67,4 +67,4 @@ public partial class AuditLogs
         public bool ShowDetails { get; set; }
         public DateTime LocalTime { get; set; }
     }
-}
+}*/

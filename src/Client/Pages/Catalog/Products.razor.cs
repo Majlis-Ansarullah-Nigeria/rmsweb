@@ -1,4 +1,4 @@
-﻿using FSH.WebApi.Shared.Authorization;
+﻿/*using FSH.WebApi.Shared.Authorization;
 using Mapster;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -155,4 +155,4 @@ public class ProductViewModel : UpdateProductRequest
     public string? ImagePath { get; set; }
     public string? ImageInBytes { get; set; }
     public string? ImageExtension { get; set; }
-}
+}*/

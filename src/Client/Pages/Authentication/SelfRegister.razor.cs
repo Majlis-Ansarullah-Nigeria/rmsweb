@@ -23,7 +23,7 @@ public partial class SelfRegister
 
     private async Task SubmitAsync()
     {
-        BusySubmitting = true;
+        /*BusySubmitting = true;
 
         string? sucessMessage = await ApiHelper.ExecuteCallGuardedAsync(
             () => UsersClient.SelfRegisterAsync(Tenant, _createUserRequest),
@@ -36,7 +36,7 @@ public partial class SelfRegister
             Navigation.NavigateTo("/login");
         }
 
-        BusySubmitting = false;
+        BusySubmitting = false;*/
     }
 
     private void TogglePasswordVisibility()

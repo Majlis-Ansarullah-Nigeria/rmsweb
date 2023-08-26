@@ -1,4 +1,4 @@
-﻿@page "/catalog/brands"
+﻿@*@page "/catalog/brands"
 @attribute [MustHavePermission(FSHAction.View, FSHResource.Brands)]
 
 @inject IStringLocalizer<Brands> L
@@ -43,4 +43,4 @@
             updateFunc: async (id, brand) => await BrandsClient.UpdateAsync(id, brand),
             deleteFunc: async id => await BrandsClient.DeleteAsync(id),
             exportAction: string.Empty);
-}
+}*@

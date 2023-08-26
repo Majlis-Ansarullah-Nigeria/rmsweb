@@ -1,4 +1,4 @@
-﻿using FSH.WebApi.Shared.Authorization;
+﻿/*using FSH.WebApi.Shared.Authorization;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -117,4 +117,4 @@ public partial class Tenants
     {
         public bool ShowDetails { get; set; }
     }
-}
+}*/

@@ -1,4 +1,4 @@
-﻿using FSH.WebApi.Shared.Multitenancy;
+﻿/*using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.Components;
 using rmsweb.Client.Components.Common;
 using rmsweb.Client.Infrastructure.ApiClient;
@@ -27,4 +27,4 @@ public partial class ForgotPassword
 
         BusySubmitting = false;
     }
-}
+}*/

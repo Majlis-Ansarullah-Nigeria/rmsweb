@@ -23,25 +23,25 @@ public static class ApiHelper
 
             return result;
         }
-        catch (ApiException<HttpValidationProblemDetails> ex)
+        catch (Exception ex)
         {
-            if (ex.Result.Errors is not null)
+           /* if (ex.Message is not null)
             {
-                customValidation?.DisplayErrors(ex.Result.Errors);
+                customValidation?.DisplayErrors(ex.Message);
             }
             else
             {
                 snackbar.Add("Something went wrong!", Severity.Error);
-            }
+            }*/
         }
-        catch (ApiException<ErrorResult> ex)
+       /* catch (Exception ex)
         {
             snackbar.Add(ex.Result.Exception, Severity.Error);
         }
         catch (Exception ex)
         {
             snackbar.Add(ex.Message, Severity.Error);
-        }
+        }*/
 
         return default;
     }
@@ -64,7 +64,7 @@ public static class ApiHelper
 
             return true;
         }
-        catch (ApiException<HttpValidationProblemDetails> ex)
+       /* catch (Exception<HttpValidationProblemDetails> ex)
         {
             if (ex.Result.Errors is not null)
             {
@@ -74,10 +74,10 @@ public static class ApiHelper
             {
                 snackbar.Add("Something went wrong!", Severity.Error);
             }
-        }
-        catch (ApiException<ErrorResult> ex)
+        }*/
+        catch (Exception ex)
         {
-            snackbar.Add(ex.Result.Exception, Severity.Error);
+            snackbar.Add(ex.Message, Severity.Error);
         }
 
         return false;

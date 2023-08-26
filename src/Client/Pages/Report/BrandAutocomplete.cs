@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿/*using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using MudBlazor;
 using rmsweb.Client.Infrastructure.ApiClient;
@@ -64,4 +64,4 @@ public class BrandAutocomplete : MudAutocomplete<Guid>
 
     private string GetBrandName(Guid id) =>
         _brands.Find(b => b.Id == id)?.Name ?? string.Empty;
-}
+}*/

@@ -5,7 +5,7 @@
 
 <FshTitle Title="@L["Reports"]" Description="@L["Manage Report Types."]" />
 
-<EntityTable @ref="_table" TEntity="ProductDto" TId="Guid" TRequest="ProductViewModel" Context="@Context">
+@*<EntityTable @ref="_table" TEntity="ProductDto" TId="Guid" TRequest="ProductViewModel" Context="@Context">
 
     <AdvancedSearchContent>
         <BrandAutocomplete @bind-Value="SearchBrandId" />
@@ -14,10 +14,7 @@
     </AdvancedSearchContent>
     <ExtraActions>
         <MudMenuItem OnClick="(() => ViewReport(context.Id))">@L["View Detail"]</MudMenuItem>
-       @* @if (_canViewRoles)
-        {
-            <MudMenuItem OnClick="(() => ManageReportSections(context.Id))">@L["Manage Roles"]</MudMenuItem>
-        }*@
+
         <MudMenuItem OnClick="(() => ManageReportSections(context.Id))">@L["Manage Report Sections"]</MudMenuItem>
     </ExtraActions>
 
@@ -77,4 +74,4 @@
         </MudItem>
     </EditFormContent>
 
-</EntityTable>
+</EntityTable>*@

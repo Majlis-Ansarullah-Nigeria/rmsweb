@@ -16,7 +16,7 @@ public partial class Security
 
     private async Task ChangePasswordAsync()
     {
-        if (await ApiHelper.ExecuteCallGuardedAsync(
+        /*if (await ApiHelper.ExecuteCallGuardedAsync(
             () => PersonalClient.ChangePasswordAsync(_passwordModel),
             Snackbar,
             _customValidation,
@@ -25,7 +25,7 @@ public partial class Security
             _passwordModel.Password = string.Empty;
             _passwordModel.NewPassword = string.Empty;
             _passwordModel.ConfirmNewPassword = string.Empty;
-        }
+        }*/
     }
 
     private bool _currentPasswordVisibility;
