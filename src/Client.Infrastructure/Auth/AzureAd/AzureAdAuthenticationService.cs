@@ -16,7 +16,7 @@ internal class AzureAdAuthenticationService : IAuthenticationService
     public void NavigateToExternalLogin(string returnUrl) =>
         _navigation.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(returnUrl)}");
 
-    public Task<bool> LoginAsync(string tenantId, TokenRequest request) =>
+    public Task<bool> LoginAsync(TokenRequest request) =>
         throw new NotImplementedException();
 
     public async Task LogoutAsync()

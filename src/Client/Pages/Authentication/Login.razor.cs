@@ -68,7 +68,7 @@ public partial class Login
         BusySubmitting = true;
 
         if (await ApiHelper.ExecuteCallGuardedAsync(
-            () => AuthService.LoginAsync(TenantId, _tokenRequest),
+            () => AuthService.LoginAsync(_tokenRequest),
             Snackbar,
             _customValidation))
         {
