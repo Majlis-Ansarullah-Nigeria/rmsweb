@@ -1,0 +1,31 @@
+﻿@page "/reportquestions/{ReportTypeId}"
+@attribute [MustHavePermission(FSHAction.View, FSHResource.Questions)]
+
+@inject IStringLocalizer<SectionQuestionServices> L
+
+<FshTitle Title="@L["Questions"]" Description="@L["Manage Report QUestions"]" />
+
+<EntityTable TEntity="ReportQuestionsModel" TId="Guid" TRequest="ReportQuestionRequest" Context="@Context" >
+    <ExtraActions>
+
+        <MudMenuItem OnClick="(() => ViewProfile())">@L["View Profile"]</MudMenuItem>
+
+        @if (_canViewRoles)
+        {
+            <MudMenuItem OnClick="(() => ManageRoles(context.Id))">@L["Manage Roles"]</MudMenuItem>
+        }
+    </ExtraActions>
+
+    <EditFormContent>
+        <MudItem xs="12" md="6">
+            <MudTextField For="@(() => context.Text)" @bind-Value="context.Text" Label="@L["Text"]" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField For="@(() => context.Points)" @bind-Value="context.Points" Label="@L["Points"]" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField For="@(() => context.ResponseType)" @bind-Value="context.ResponseType" Label="@L["Last Name"]" />
+        </MudItem>
+    </EditFormContent>
+
+</EntityTable>
