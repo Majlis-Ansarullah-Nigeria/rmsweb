@@ -1,22 +1,23 @@
 ﻿using FSH.WebApi.Shared.Authorization;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using rmsweb.Client.Components.EntityTable;
 using rmsweb.Client.Infrastructure.ApiClient;
 using rmsweb.Client.Infrastructure.Auth;
 using rmsweb.Client.Shared;
+using static MudBlazor.CategoryTypes;
 
 namespace rmsweb.Client.Pages.Report;
 public partial class ReportTypeSections
 {
     [Parameter]
-    public string? Id { get; set; }
-    [CascadingParameter]
-    protected Task<AuthenticationState> AuthState { get; set; } = default!;
+    public string Id { get; set; } = default!;
     [Inject]
-    protected IAuthorizationService AuthService { get; set; } = default!;
-    [Inject]
-    protected IUsersClient UsersClient { get; set; } = default!;
+    protected IReportTypeSectionsClient ReportTypeSectionsClient { get; set; } = default!;
+    private EntityTable<ReportTypeSectionDto, Guid, ReportTypeSectionViewModel> _table = default!;
+    protected EntityServerTableContext<ReportTypeSectionDto, Guid, ReportTypeSectionViewModel> Context { get; set; } = default!;
 
     private List<UserRoleDto> _userRolesList = default!;
 
@@ -29,48 +30,84 @@ public partial class ReportTypeSections
     private bool _canSearchRoles;
     private bool _loaded;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var state = await AuthState;
-        _canEditUsers = await AuthService.HasPermissionAsync(state.User, FSHAction.Update, FSHResource.Users);
-        _canSearchRoles = await AuthService.HasPermissionAsync(state.User, FSHAction.View, FSHResource.UserRoles);
-
-        if (await ApiHelper.ExecuteCallGuardedAsync(
-                () => UsersClient.GetByIdAsync(Id), Snackbar)
-            is UserDetailsDto user)
-        {
-            _title = $"{user.FirstName} {user.LastName}";
-            _description = string.Format(L["Manage {0} {1}'s Roles"], user.FirstName, user.LastName);
-
-            if (await ApiHelper.ExecuteCallGuardedAsync(
-                    () => UsersClient.GetRolesAsync(user.Id.ToString()), Snackbar)
-                is ICollection<UserRoleDto> response)
+    protected override void OnInitialized() =>
+        Context = new(
+            entityName: L["ReportTypeSection"],
+            entityNamePlural: L["ReportTypeSections"],
+            // entityResource: FSHResource.Products,
+            fields: new()
             {
-                _userRolesList = response.ToList();
-            }
-        }
+                new(prod => prod.Name, L["Name"], "Name"),
+                new(prod => prod.Description, L["Description"], "Description"),
+            },
+            enableAdvancedSearch: true,
+            idFunc: reportType => reportType.Id,
+            searchFunc: async filter =>
+            {
+                var reportTypeId = Guid.Parse(Id);
+                var result = await ReportTypeSectionsClient.GetReportTypeSectionsByReportTypeAsync(reportTypeId);
+                return result.Adapt<PaginationResponse<ReportTypeSectionDto>>();
+            },
+            createFunc: async prod =>
+            {
+                await ReportTypeSectionsClient.CreateReportTypeSectionAsync(prod.Adapt<CreateReportTypeSectionRequest>());
+            },
+            updateFunc: async (id, prod) =>
+            {
+                await ReportTypeSectionsClient.UpdateReportTypeSectionAsync(id, prod.Adapt<UpdateReportTypeSectionRequest>());
+            });
 
-        _loaded = true;
-    }
-
-    private async Task SaveAsync()
+    private Guid _searchBrandId;
+    private Guid SearchBrandId
     {
-        var request = new UserRolesRequest()
+        get => _searchBrandId;
+        set
         {
-            UserRoles = _userRolesList
-        };
-
-        if (await ApiHelper.ExecuteCallGuardedAsync(
-                () => UsersClient.AssignRolesAsync(Id, request),
-                Snackbar,
-                successMessage: L["Updated User Roles."])
-            is not null)
-        {
-            Navigation.NavigateTo("/users");
+            _searchBrandId = value;
+            _ = _table.ReloadDataAsync();
         }
     }
 
-    private bool Search(UserRoleDto userRole) =>
-        string.IsNullOrWhiteSpace(_searchString)
-            || userRole.RoleName?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) is true;
+    private decimal _searchMinimumRate;
+    private decimal SearchMinimumRate
+    {
+        get => _searchMinimumRate;
+        set
+        {
+            _searchMinimumRate = value;
+            _ = _table.ReloadDataAsync();
+        }
+    }
+
+    private decimal _searchMaximumRate = 9999;
+    private decimal SearchMaximumRate
+    {
+        get => _searchMaximumRate;
+        set
+        {
+            _searchMaximumRate = value;
+            _ = _table.ReloadDataAsync();
+        }
+    }
+
+    //private void ViewReport(in Guid reportTypeId) =>
+    //   Navigation.NavigateTo($"/reportTypes/{reportTypeId}");
+
+    //private void ManageReportSections(in Guid reportTypeId) =>
+    //    Navigation.NavigateTo($"/reportTypes/{reportTypeId}/sections");
+}
+
+public class ReportTypeSectionViewModel
+{
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public Guid ReportTypeId { get; set; }
+}
+
+public class ReportTypeSectionDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public Guid ReportTypeId { get; set; }
 }
