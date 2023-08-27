@@ -45,12 +45,15 @@
 
             <ToolBarContent>
                 <div class="justify-center mud-text-align-center">
-                    @if (_canCreate)
+                    <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary"
+                               OnClick="(() => InvokeModal())" StartIcon="@Icons.Material.Filled.Add"
+                               IconColor="Color.Surface">@L["Create"]</MudButton>
+                   @* @if (_canCreate)
                     {
                         <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary"
                             OnClick="(() => InvokeModal())" StartIcon="@Icons.Material.Filled.Add"
                             IconColor="Color.Surface">@L["Create"]</MudButton>
-                    }
+                    }*@
                     @if (_canExport)
                     {
                         <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Tertiary"
