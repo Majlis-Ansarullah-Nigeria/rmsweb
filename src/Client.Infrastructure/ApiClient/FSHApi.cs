@@ -22,11 +22,11 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     public partial interface IReportsClient : IApiService
     {
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> SaveReportAsync(string api_version, ReportRequest request);
+        System.Threading.Tasks.Task<ResultOfBoolean> SaveReportAsync(string api_version, ReportRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> SaveReportAsync(string api_version, ReportRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfBoolean> SaveReportAsync(string api_version, ReportRequest request, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -58,14 +58,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> SaveReportAsync(string api_version, ReportRequest request)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> SaveReportAsync(string api_version, ReportRequest request)
         {
             return SaveReportAsync(api_version, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> SaveReportAsync(string api_version, ReportRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> SaveReportAsync(string api_version, ReportRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
@@ -89,7 +89,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -112,12 +112,24 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200 || status_ == 206)
+                        if (status_ == 400)
                         {
-                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
-                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
-                            return fileResponse_;
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -249,14 +261,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Create new report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateReportTypeAsync(CreateReportTypeRequest model);
+        System.Threading.Tasks.Task<ResultOfBoolean> CreateReportTypeAsync(CreateReportTypeRequest model);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create new report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task CreateReportTypeAsync(CreateReportTypeRequest model, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfBoolean> CreateReportTypeAsync(CreateReportTypeRequest model, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get list of all report types.
@@ -275,14 +287,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get list of Qaid report types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetQaidReportTypesAsync();
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeDto> GetQaidReportTypesAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get list of Qaid report types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetQaidReportTypesAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeDto> GetQaidReportTypesAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a specific report type by id.
@@ -301,27 +313,27 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// update a specific report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateReportTypeAsync(System.Guid id, UpdateReportTypeRequest request);
+        System.Threading.Tasks.Task<ResultOfBoolean> UpdateReportTypeAsync(System.Guid id, UpdateReportTypeRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// update a specific report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateReportTypeAsync(System.Guid id, UpdateReportTypeRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfBoolean> UpdateReportTypeAsync(System.Guid id, UpdateReportTypeRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// update a Report Type Activeness State
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid reportTypeId, bool? state, string id);
+        System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid reportTypeId, bool? state, string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// update a Report Type Activeness State
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid reportTypeId, bool? state, string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid reportTypeId, bool? state, string id, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -356,7 +368,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Create new report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task CreateReportTypeAsync(CreateReportTypeRequest model)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> CreateReportTypeAsync(CreateReportTypeRequest model)
         {
             return CreateReportTypeAsync(model, System.Threading.CancellationToken.None);
         }
@@ -366,7 +378,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Create new report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task CreateReportTypeAsync(CreateReportTypeRequest model, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> CreateReportTypeAsync(CreateReportTypeRequest model, System.Threading.CancellationToken cancellationToken)
         {
             if (model == null)
                 throw new System.ArgumentNullException("model");
@@ -385,6 +397,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -429,7 +442,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -533,7 +551,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get list of Qaid report types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetQaidReportTypesAsync()
+        public virtual System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeDto> GetQaidReportTypesAsync()
         {
             return GetQaidReportTypesAsync(System.Threading.CancellationToken.None);
         }
@@ -543,7 +561,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get list of Qaid report types.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetQaidReportTypesAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeDto> GetQaidReportTypesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("api/v1/reporttypes/qaidreporttypes");
@@ -555,6 +573,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -579,7 +598,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfIEnumerableOfReportTypeDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -703,7 +727,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// update a specific report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task UpdateReportTypeAsync(System.Guid id, UpdateReportTypeRequest request)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> UpdateReportTypeAsync(System.Guid id, UpdateReportTypeRequest request)
         {
             return UpdateReportTypeAsync(id, request, System.Threading.CancellationToken.None);
         }
@@ -713,7 +737,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// update a specific report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task UpdateReportTypeAsync(System.Guid id, UpdateReportTypeRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> UpdateReportTypeAsync(System.Guid id, UpdateReportTypeRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -736,6 +760,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -770,7 +795,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -796,7 +826,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// update a Report Type Activeness State
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid reportTypeId, bool? state, string id)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid reportTypeId, bool? state, string id)
         {
             return SetReportTypeStateAsync(reportTypeId, state, id, System.Threading.CancellationToken.None);
         }
@@ -806,7 +836,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// update a Report Type Activeness State
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid reportTypeId, bool? state, string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid reportTypeId, bool? state, string id, System.Threading.CancellationToken cancellationToken)
         {
             if (reportTypeId == null)
                 throw new System.ArgumentNullException("reportTypeId");
@@ -832,6 +862,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 {
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -866,7 +897,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -998,66 +1034,66 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Create a new section in a report type .
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> CreateReportTypeSectionAsync(CreateReportTypeSectionRequest model);
+        System.Threading.Tasks.Task<ResultOfBoolean> CreateReportTypeSectionAsync(CreateReportTypeSectionRequest model);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Create a new section in a report type .
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> CreateReportTypeSectionAsync(CreateReportTypeSectionRequest model, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfBoolean> CreateReportTypeSectionAsync(CreateReportTypeSectionRequest model, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Update the name and description of a report type section.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> UpdateReportTypeSectionAsync(System.Guid reportTypeSectionId, UpdateReportTypeSectionRequest model);
+        System.Threading.Tasks.Task<ResultOfBoolean> UpdateReportTypeSectionAsync(System.Guid reportTypeSectionId, UpdateReportTypeSectionRequest model);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Update the name and description of a report type section.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> UpdateReportTypeSectionAsync(System.Guid reportTypeSectionId, UpdateReportTypeSectionRequest model, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfBoolean> UpdateReportTypeSectionAsync(System.Guid reportTypeSectionId, UpdateReportTypeSectionRequest model, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get a report type section by id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetReportTypeSectionAsync(System.Guid reportTypeSectionId);
+        System.Threading.Tasks.Task<ResultOfReportTypeSectionDto> GetReportTypeSectionAsync(System.Guid reportTypeSectionId);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a report type section by id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetReportTypeSectionAsync(System.Guid reportTypeSectionId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfReportTypeSectionDto> GetReportTypeSectionAsync(System.Guid reportTypeSectionId, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// Get list of all sections in a report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId);
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeSectionDto> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get list of all sections in a report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeSectionDto> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// update a Report-Type sction Activeness state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid reportTypeSectionId, bool state);
+        System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid reportTypeSectionId, bool state);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// update a Report-Type sction Activeness state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid reportTypeSectionId, bool state, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid reportTypeSectionId, bool state, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -1092,7 +1128,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Create a new section in a report type .
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> CreateReportTypeSectionAsync(CreateReportTypeSectionRequest model)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> CreateReportTypeSectionAsync(CreateReportTypeSectionRequest model)
         {
             return CreateReportTypeSectionAsync(model, System.Threading.CancellationToken.None);
         }
@@ -1102,7 +1138,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Create a new section in a report type .
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> CreateReportTypeSectionAsync(CreateReportTypeSectionRequest model, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> CreateReportTypeSectionAsync(CreateReportTypeSectionRequest model, System.Threading.CancellationToken cancellationToken)
         {
             if (model == null)
                 throw new System.ArgumentNullException("model");
@@ -1121,7 +1157,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1144,12 +1180,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200 || status_ == 206)
+                        if (status_ == 200)
                         {
-                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
-                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
-                            return fileResponse_;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -1175,7 +1213,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Update the name and description of a report type section.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> UpdateReportTypeSectionAsync(System.Guid reportTypeSectionId, UpdateReportTypeSectionRequest model)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> UpdateReportTypeSectionAsync(System.Guid reportTypeSectionId, UpdateReportTypeSectionRequest model)
         {
             return UpdateReportTypeSectionAsync(reportTypeSectionId, model, System.Threading.CancellationToken.None);
         }
@@ -1185,7 +1223,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Update the name and description of a report type section.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> UpdateReportTypeSectionAsync(System.Guid reportTypeSectionId, UpdateReportTypeSectionRequest model, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> UpdateReportTypeSectionAsync(System.Guid reportTypeSectionId, UpdateReportTypeSectionRequest model, System.Threading.CancellationToken cancellationToken)
         {
             if (reportTypeSectionId == null)
                 throw new System.ArgumentNullException("reportTypeSectionId");
@@ -1208,7 +1246,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("PUT");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1231,12 +1269,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200 || status_ == 206)
+                        if (status_ == 200)
                         {
-                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
-                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
-                            return fileResponse_;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -1262,7 +1302,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get a report type section by id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> GetReportTypeSectionAsync(System.Guid reportTypeSectionId)
+        public virtual System.Threading.Tasks.Task<ResultOfReportTypeSectionDto> GetReportTypeSectionAsync(System.Guid reportTypeSectionId)
         {
             return GetReportTypeSectionAsync(reportTypeSectionId, System.Threading.CancellationToken.None);
         }
@@ -1272,7 +1312,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get a report type section by id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> GetReportTypeSectionAsync(System.Guid reportTypeSectionId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfReportTypeSectionDto> GetReportTypeSectionAsync(System.Guid reportTypeSectionId, System.Threading.CancellationToken cancellationToken)
         {
             if (reportTypeSectionId == null)
                 throw new System.ArgumentNullException("reportTypeSectionId");
@@ -1288,7 +1328,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1311,12 +1351,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200 || status_ == 206)
+                        if (status_ == 200)
                         {
-                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
-                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
-                            return fileResponse_;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfReportTypeSectionDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -1342,7 +1384,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get list of all sections in a report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId)
+        public virtual System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeSectionDto> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId)
         {
             return GetReportTypeSectionsByReportTypeAsync(reportTypeId, System.Threading.CancellationToken.None);
         }
@@ -1352,7 +1394,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get list of all sections in a report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeSectionDto> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId, System.Threading.CancellationToken cancellationToken)
         {
             if (reportTypeId == null)
                 throw new System.ArgumentNullException("reportTypeId");
@@ -1368,7 +1410,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1391,12 +1433,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200 || status_ == 206)
+                        if (status_ == 200)
                         {
-                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
-                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
-                            return fileResponse_;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfIEnumerableOfReportTypeSectionDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -1422,7 +1466,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// update a Report-Type sction Activeness state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid reportTypeSectionId, bool state)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid reportTypeSectionId, bool state)
         {
             return SetReportTypeStateAsync(reportTypeSectionId, state, System.Threading.CancellationToken.None);
         }
@@ -1432,7 +1476,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// update a Report-Type sction Activeness state.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid reportTypeSectionId, bool state, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid reportTypeSectionId, bool state, System.Threading.CancellationToken cancellationToken)
         {
             if (reportTypeSectionId == null)
                 throw new System.ArgumentNullException("reportTypeSectionId");
@@ -1453,6 +1497,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 {
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1487,7 +1532,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -1613,72 +1663,108 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface ISectionQuestionServicesClient : IApiService
+    public partial interface ISectionQuestionClient : IApiService
     {
+        /// <summary>
+        /// add a question
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AddQuestionAsync(string api_version, ReportQuestionRequest request);
+        System.Threading.Tasks.Task<ResultOfBoolean> AddQuestionAsync(string api_version, ReportQuestionRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// add a question
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AddQuestionAsync(string api_version, ReportQuestionRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfBoolean> AddQuestionAsync(string api_version, ReportQuestionRequest request, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// get a specific question by id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetQuestionAsync(System.Guid questionId, string api_version);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetQuestionAsync(System.Guid questionId, string api_version, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version);
+        System.Threading.Tasks.Task<ResultOfQuestionDto> GetQuestionAsync(System.Guid questionId, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get a specific question by id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfQuestionDto> GetQuestionAsync(System.Guid questionId, string api_version, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// get the questions of a section by section id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version);
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfQuestionDto> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get the questions of a section by section id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfQuestionDto> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// get all questions of a report type by report type id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version);
+        System.Threading.Tasks.Task<ResultOfReportQuestionsModel> GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get all questions of a report type by report type id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfReportQuestionsModel> GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// update a question point
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a question point
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version, System.Threading.CancellationToken cancellationToken);
+
+        /// <summary>
+        /// update a question text
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a question text
+        /// </summary>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// update a question Activeness State.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid questionId, bool state, string api_version);
+        System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid questionId, bool state, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// update a question Activeness State.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid questionId, bool state, string api_version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid questionId, bool state, string api_version, System.Threading.CancellationToken cancellationToken);
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SectionQuestionServicesClient : ISectionQuestionServicesClient
+    public partial class SectionQuestionClient : ISectionQuestionClient
     {
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public SectionQuestionServicesClient(System.Net.Http.HttpClient httpClient)
+        public SectionQuestionClient(System.Net.Http.HttpClient httpClient)
         {
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
@@ -1699,21 +1785,27 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
+        /// <summary>
+        /// add a question
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task AddQuestionAsync(string api_version, ReportQuestionRequest request)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> AddQuestionAsync(string api_version, ReportQuestionRequest request)
         {
             return AddQuestionAsync(api_version, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// add a question
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task AddQuestionAsync(string api_version, ReportQuestionRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> AddQuestionAsync(string api_version, ReportQuestionRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices?");
+            urlBuilder_.Append("api/sectionquestion/question?");
             if (api_version != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("api-version") + "=").Append(System.Uri.EscapeDataString(ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1731,6 +1823,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1775,7 +1868,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -1797,21 +1895,27 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// get a specific question by id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetQuestionAsync(System.Guid questionId, string api_version)
+        public virtual System.Threading.Tasks.Task<ResultOfQuestionDto> GetQuestionAsync(System.Guid questionId, string api_version)
         {
             return GetQuestionAsync(questionId, api_version, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get a specific question by id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetQuestionAsync(System.Guid questionId, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfQuestionDto> GetQuestionAsync(System.Guid questionId, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (questionId == null)
                 throw new System.ArgumentNullException("questionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/getquestion/{questionId}?");
+            urlBuilder_.Append("api/sectionquestion/question/{questionId}?");
             urlBuilder_.Replace("{questionId}", System.Uri.EscapeDataString(ConvertToString(questionId, System.Globalization.CultureInfo.InvariantCulture)));
             if (api_version != null)
             {
@@ -1826,6 +1930,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1850,7 +1955,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfQuestionDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -1872,21 +1982,27 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// get the questions of a section by section id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version)
+        public virtual System.Threading.Tasks.Task<ResultOfIEnumerableOfQuestionDto> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version)
         {
             return GetSectionQuestionsBySectionIdAsync(sectionId, api_version, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get the questions of a section by section id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfIEnumerableOfQuestionDto> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (sectionId == null)
                 throw new System.ArgumentNullException("sectionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/getsectionquestionsbysectionid/{sectionId}?");
+            urlBuilder_.Append("api/sectionquestion/sectionquestionsbysectionid/{sectionId}?");
             urlBuilder_.Replace("{sectionId}", System.Uri.EscapeDataString(ConvertToString(sectionId, System.Globalization.CultureInfo.InvariantCulture)));
             if (api_version != null)
             {
@@ -1901,6 +2017,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1935,7 +2052,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfIEnumerableOfQuestionDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -1957,21 +2079,27 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// get all questions of a report type by report type id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version)
+        public virtual System.Threading.Tasks.Task<ResultOfReportQuestionsModel> GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version)
         {
             return GetReportTypeQuestionsAsync(reportTypeId, api_version, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get all questions of a report type by report type id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfReportQuestionsModel> GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (reportTypeId == null)
                 throw new System.ArgumentNullException("reportTypeId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/{reportTypeId}/questions?");
+            urlBuilder_.Append("api/sectionquestion/{reportTypeId}/questions?");
             urlBuilder_.Replace("{reportTypeId}", System.Uri.EscapeDataString(ConvertToString(reportTypeId, System.Globalization.CultureInfo.InvariantCulture)));
             if (api_version != null)
             {
@@ -1986,6 +2114,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2020,7 +2149,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfReportQuestionsModel>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -2042,21 +2176,27 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// update a question point
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version)
         {
             return UpdateQuestionPointAsync(questionId, point, api_version, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a question point
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (questionId == null)
                 throw new System.ArgumentNullException("questionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/updatequestionpoint/{questionId}?");
+            urlBuilder_.Append("api/sectionquestion/questionpoint/{questionId}?");
             urlBuilder_.Replace("{questionId}", System.Uri.EscapeDataString(ConvertToString(questionId, System.Globalization.CultureInfo.InvariantCulture)));
             if (point != null)
             {
@@ -2076,6 +2216,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 {
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("PATCH");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2110,7 +2251,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -2132,21 +2278,27 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// update a question text
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version)
         {
             return UpdateQuestionTextAsync(questionId, text, api_version, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a question text
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (questionId == null)
                 throw new System.ArgumentNullException("questionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/updatequestiontext/{questionId}?");
+            urlBuilder_.Append("api/sectionquestion/questiontext/{questionId}?");
             urlBuilder_.Replace("{questionId}", System.Uri.EscapeDataString(ConvertToString(questionId, System.Globalization.CultureInfo.InvariantCulture)));
             if (text != null)
             {
@@ -2166,6 +2318,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 {
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("PATCH");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2200,7 +2353,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -2226,7 +2384,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// update a question Activeness State.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid questionId, bool state, string api_version)
+        public virtual System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid questionId, bool state, string api_version)
         {
             return SetReportTypeStateAsync(questionId, state, api_version, System.Threading.CancellationToken.None);
         }
@@ -2236,7 +2394,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// update a question Activeness State.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task SetReportTypeStateAsync(System.Guid questionId, bool state, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfBoolean> SetReportTypeStateAsync(System.Guid questionId, bool state, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (questionId == null)
                 throw new System.ArgumentNullException("questionId");
@@ -2245,7 +2403,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("state");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/{questionId}/{state}?");
+            urlBuilder_.Append("api/sectionquestion/{questionId}/{state}?");
             urlBuilder_.Replace("{questionId}", System.Uri.EscapeDataString(ConvertToString(questionId, System.Globalization.CultureInfo.InvariantCulture)));
             urlBuilder_.Replace("{state}", System.Uri.EscapeDataString(ConvertToString(state, System.Globalization.CultureInfo.InvariantCulture)));
             if (api_version != null)
@@ -2262,6 +2420,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 {
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2296,7 +2455,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfBoolean>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -2425,32 +2589,32 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     public partial interface ISubmissionWindowClient : IApiService
     {
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission);
+        System.Threading.Tasks.Task<ResultOfSubmissionWindow> UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfSubmissionWindow> UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetSubmissionWindowAsync(string api_version, PaginationFilter filter);
+        System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetSubmissionWindowAsync(string api_version, PaginationFilter filter, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetSubmissionWindow2Async(System.Guid submissionWindowId, string api_version);
+        System.Threading.Tasks.Task<ResultOfPaginatedResultOfSubmissionWindow> GetSubmissionWindowAsync(string api_version, PaginationFilter filter);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<FileResponse> GetSubmissionWindow2Async(System.Guid submissionWindowId, string api_version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfPaginatedResultOfSubmissionWindow> GetSubmissionWindowAsync(string api_version, PaginationFilter filter, System.Threading.CancellationToken cancellationToken);
+
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<ResultOfSubmissionWindowDto> GetSubmissionWindow2Async(System.Guid submissionWindowId, string api_version);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<ResultOfSubmissionWindowDto> GetSubmissionWindow2Async(System.Guid submissionWindowId, string api_version, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -2482,14 +2646,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission)
+        public virtual System.Threading.Tasks.Task<ResultOfSubmissionWindow> UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission)
         {
             return UpdateSubmissionWindowAsync(updateId, api_version, updateSubmission, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfSubmissionWindow> UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission, System.Threading.CancellationToken cancellationToken)
         {
             if (updateId == null)
                 throw new System.ArgumentNullException("updateId");
@@ -2517,6 +2681,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("PATCH");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2551,7 +2716,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfSubmissionWindow>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -2574,14 +2744,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model)
+        public virtual System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model)
         {
             return AddSubmissionWindowAsync(api_version, model, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken)
         {
             if (model == null)
                 throw new System.ArgumentNullException("model");
@@ -2605,7 +2775,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2628,12 +2798,24 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200 || status_ == 206)
+                        if (status_ == 400)
                         {
-                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
-                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
-                            return fileResponse_;
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfSubmissionWindow>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -2656,14 +2838,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> GetSubmissionWindowAsync(string api_version, PaginationFilter filter)
+        public virtual System.Threading.Tasks.Task<ResultOfPaginatedResultOfSubmissionWindow> GetSubmissionWindowAsync(string api_version, PaginationFilter filter)
         {
             return GetSubmissionWindowAsync(api_version, filter, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> GetSubmissionWindowAsync(string api_version, PaginationFilter filter, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfPaginatedResultOfSubmissionWindow> GetSubmissionWindowAsync(string api_version, PaginationFilter filter, System.Threading.CancellationToken cancellationToken)
         {
             if (filter == null)
                 throw new System.ArgumentNullException("filter");
@@ -2687,7 +2869,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2710,12 +2892,24 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200 || status_ == 206)
+                        if (status_ == 400)
                         {
-                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
-                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
-                            return fileResponse_;
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfPaginatedResultOfSubmissionWindow>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -2738,14 +2932,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<FileResponse> GetSubmissionWindow2Async(System.Guid submissionWindowId, string api_version)
+        public virtual System.Threading.Tasks.Task<ResultOfSubmissionWindowDto> GetSubmissionWindow2Async(System.Guid submissionWindowId, string api_version)
         {
             return GetSubmissionWindow2Async(submissionWindowId, api_version, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<FileResponse> GetSubmissionWindow2Async(System.Guid submissionWindowId, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfSubmissionWindowDto> GetSubmissionWindow2Async(System.Guid submissionWindowId, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (submissionWindowId == null)
                 throw new System.ArgumentNullException("submissionWindowId");
@@ -2766,7 +2960,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2789,12 +2983,24 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200 || status_ == 206)
+                        if (status_ == 400)
                         {
-                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
-                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
-                            return fileResponse_;
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfSubmissionWindowDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -2923,11 +3129,11 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     public partial interface IClient : IApiService
     {
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Get_all_submission_windows_Async(System.Guid? reportTypeId, int? month, int? year, string status, bool? isLocked, System.DateTime? startDate, System.DateTime? endDate, string windowSubmissions, string api_version);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<SubmissionWindowResponseModel>> Get_all_submission_windows_Async(System.Guid? reportTypeId, int? month, int? year, string status, bool? isLocked, System.DateTime? startDate, System.DateTime? endDate, string windowSubmissions, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task Get_all_submission_windows_Async(System.Guid? reportTypeId, int? month, int? year, string status, bool? isLocked, System.DateTime? startDate, System.DateTime? endDate, string windowSubmissions, string api_version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<SubmissionWindowResponseModel>> Get_all_submission_windows_Async(System.Guid? reportTypeId, int? month, int? year, string status, bool? isLocked, System.DateTime? startDate, System.DateTime? endDate, string windowSubmissions, string api_version, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -2959,14 +3165,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task Get_all_submission_windows_Async(System.Guid? reportTypeId, int? month, int? year, string status, bool? isLocked, System.DateTime? startDate, System.DateTime? endDate, string windowSubmissions, string api_version)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<SubmissionWindowResponseModel>> Get_all_submission_windows_Async(System.Guid? reportTypeId, int? month, int? year, string status, bool? isLocked, System.DateTime? startDate, System.DateTime? endDate, string windowSubmissions, string api_version)
         {
             return Get_all_submission_windows_Async(reportTypeId, month, year, status, isLocked, startDate, endDate, windowSubmissions, api_version, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task Get_all_submission_windows_Async(System.Guid? reportTypeId, int? month, int? year, string status, bool? isLocked, System.DateTime? startDate, System.DateTime? endDate, string windowSubmissions, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<SubmissionWindowResponseModel>> Get_all_submission_windows_Async(System.Guid? reportTypeId, int? month, int? year, string status, bool? isLocked, System.DateTime? startDate, System.DateTime? endDate, string windowSubmissions, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (windowSubmissions == null)
                 throw new System.ArgumentNullException("windowSubmissions");
@@ -3015,6 +3221,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -3049,7 +3256,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<SubmissionWindowResponseModel>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         {
@@ -5840,6 +6052,54 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ProblemDetails
+    {
+        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Type { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Title { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Status { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("detail", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Detail { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("instance", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Instance { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfBoolean : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Result
+    {
+        [Newtonsoft.Json.JsonProperty("messages", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string> Messages { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("succeeded", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool Succeeded { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ReportRequest
     {
         [Newtonsoft.Json.JsonProperty("reporterId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -5878,35 +6138,6 @@ namespace rmsweb.Client.Infrastructure.ApiClient
 
         [Newtonsoft.Json.JsonProperty("questionResponse", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string QuestionResponse { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ProblemDetails
-    {
-        [Newtonsoft.Json.JsonProperty("type", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Type { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Title { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? Status { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("detail", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Detail { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("instance", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Instance { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [Newtonsoft.Json.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
 
     }
 
@@ -5958,16 +6189,8 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Description { get; set; }
 
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Result
-    {
-        [Newtonsoft.Json.JsonProperty("messages", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<string> Messages { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("succeeded", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Succeeded { get; set; }
+        [Newtonsoft.Json.JsonProperty("reportTag", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ReportTag { get; set; }
 
     }
 
@@ -6004,6 +6227,39 @@ namespace rmsweb.Client.Infrastructure.ApiClient
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Description { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfReportTypeSectionDto : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public ReportTypeSectionDto Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ReportTypeSectionDto
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid Id { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Description { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTypeId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ReportTypeId { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfIEnumerableOfReportTypeSectionDto : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<ReportTypeSectionDto> Data { get; set; }
 
     }
 
@@ -6047,6 +6303,230 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfQuestionDto : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public QuestionDto Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class QuestionDto
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid Id { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("sectionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid SectionId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("text", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Text { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("responseType", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ResponseType { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("points", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double Points { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfIEnumerableOfQuestionDto : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<QuestionDto> Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfReportQuestionsModel : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public ReportQuestionsModel Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ReportQuestionsModel
+    {
+        [Newtonsoft.Json.JsonProperty("reportTypeId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ReportTypeId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTypeName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ReportTypeName { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("sections", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<Sections> Sections { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Sections
+    {
+        [Newtonsoft.Json.JsonProperty("sectionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid SectionId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("title", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Title { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("questions", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<ReportSectionQuestion> Questions { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ReportSectionQuestion
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid Id { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("text", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Text { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("responseType", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public ResponseType ResponseType { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("points", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double Points { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfSubmissionWindow : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public SubmissionWindow Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SubmissionWindow : AuditableEntity
+    {
+        [Newtonsoft.Json.JsonProperty("startingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime StartingDate { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("endingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime EndingDate { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTypeId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ReportTypeId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportType", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public ReportType ReportType { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("month", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Month { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("year", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Year { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("isLocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsLocked { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("submissionOption", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public SubmissionOption SubmissionOption { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ReportType : AuditableEntity
+    {
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Description { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTag", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public ReportTag ReportTag { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsActive { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("sections", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<ReportTypeSection> Sections { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ReportTypeSection : AuditableEntity
+    {
+        [Newtonsoft.Json.JsonProperty("reportTypeId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ReportTypeId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Description { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("isActive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsActive { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public abstract partial class AuditableEntity : AuditableEntityOfGuid
+    {
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public abstract partial class AuditableEntityOfGuid : BaseEntityOfGuid
+    {
+        [Newtonsoft.Json.JsonProperty("createdBy", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string CreatedBy { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("createdOn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime CreatedOn { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("lastModifiedBy", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string LastModifiedBy { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("lastModifiedOn", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime? LastModifiedOn { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("deletedOn", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime? DeletedOn { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("deletedBy", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string DeletedBy { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("isDeleted", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsDeleted { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public abstract partial class BaseEntityOfGuid
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid Id { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("domainEvents", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<DomainEvent> DomainEvents { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public abstract partial class DomainEvent
+    {
+        [Newtonsoft.Json.JsonProperty("triggeredOn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime TriggeredOn { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum SubmissionOption
+    {
+
+        All = 1,
+
+        Selected = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class UpdateSubmissionWindowRequest
     {
         [Newtonsoft.Json.JsonProperty("startingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -6068,6 +6548,40 @@ namespace rmsweb.Client.Infrastructure.ApiClient
 
         [Newtonsoft.Json.JsonProperty("endingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime EndingDate { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfPaginatedResultOfSubmissionWindow : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public PaginatedResultOfSubmissionWindow Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PaginatedResultOfSubmissionWindow : Result
+    {
+        [Newtonsoft.Json.JsonProperty("currentPage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int CurrentPage { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("totalPages", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int TotalPages { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("totalCount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int TotalCount { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("pageSize", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int PageSize { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("hasPreviousPage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool HasPreviousPage { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("hasNextPage", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool HasNextPage { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<SubmissionWindow> Data { get; set; }
 
     }
 
@@ -6127,6 +6641,78 @@ namespace rmsweb.Client.Infrastructure.ApiClient
 
         [Newtonsoft.Json.JsonProperty("value", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public object Value { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfSubmissionWindowDto : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public SubmissionWindowDto Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SubmissionWindowDto
+    {
+        [Newtonsoft.Json.JsonProperty("submissionWindowId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid SubmissionWindowId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("month", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Month { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("year", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Year { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTypeId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ReportTypeId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTypeName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ReportTypeName { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("isLocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsLocked { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("startDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime StartDate { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("endDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime EndDate { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SubmissionWindowResponseModel
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid Id { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTypeId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ReportTypeId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTypeName", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ReportTypeName { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("month", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Month { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("year", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Year { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("startDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime StartDate { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("endDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime EndDate { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("islocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool Islocked { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Status { get; set; }
 
     }
 
