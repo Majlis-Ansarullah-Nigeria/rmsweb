@@ -22,19 +22,19 @@ public partial class ReportTypes
         Context = new(
             entityName: L["ReportType"],
             entityNamePlural: L["ReportTypes"],
-            // entityResource: FSHResource.Products,
+           // entityResource: FSHResource.Products,
             fields: new()
             {
-                new(prod => prod.Id, L["Id"], "Id"),
                 new(prod => prod.Name, L["Name"], "Name"),
                 new(prod => prod.Description, L["Description"], "Description"),
+                new(prod => prod.ReportTag, L["Report Tag"], "Report Tag"),
             },
             enableAdvancedSearch: true,
             idFunc: reportType => reportType.Id,
             searchFunc: async filter =>
             {
                 var result = await ReportTypesClient.GetReportTypesAsync();
-                return result.adapt<paginationresponse<productdto>>();
+                return result.Adapt<PaginationResponse<ReportTypeDto>>();
             },
             createFunc: async prod =>
             {
@@ -103,6 +103,7 @@ public class ReportTypeViewModel
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
+    public string? ReportTag { get; set; } = "Test";
 }
 
 public class ReportTypeDto
@@ -110,4 +111,5 @@ public class ReportTypeDto
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
+    public string? ReportTag { get; set; } = "Test";
 }

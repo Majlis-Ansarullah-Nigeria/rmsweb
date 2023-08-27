@@ -7,9 +7,7 @@
 
 <EntityTable @ref="_table" TEntity="ReportTypeDto" TId="Guid" TRequest="ReportTypeViewModel" Context="@Context">
     <ExtraActions>
-      @*  <MudMenuItem OnClick="(() => ViewReport(context.Id))">@L["View Detail"]</MudMenuItem>
-
-        <MudMenuItem OnClick="(() => ManageReportSections(context.Id))">@L["Manage Report Sections"]</MudMenuItem>*@
+        <MudMenuItem OnClick="(() => ManageReportSections(context.Id))">@L["Manage Report Type Sections"]</MudMenuItem>
     </ExtraActions>
 
     <EditFormContent>
@@ -19,6 +17,10 @@
         <MudItem xs="12" md="6">
             <MudTextField Label="@L["Description"]" For="@(() => context.Description)"
                 @bind-Value="context.Description" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField Label="@L["Report Tag"]" For="@(() => context.ReportTag)"
+            @bind-Value="context.ReportTag" />
         </MudItem>
     </EditFormContent>
 
