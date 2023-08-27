@@ -33,7 +33,6 @@ public partial class ReportTypeSections
             {
                 new(prod => prod.Name, L["Name"], "Name"),
                 new(prod => prod.Description, L["Description"], "Description"),
-                new(prod => prod.ReportTypeId, L["ReportTypeId"], "ReportTypeId"),
             },
             enableAdvancedSearch: true,
             idFunc: reportType => reportType.Id,
