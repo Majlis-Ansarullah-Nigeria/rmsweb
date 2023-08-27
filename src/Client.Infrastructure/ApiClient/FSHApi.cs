@@ -1073,14 +1073,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get list of all sections in a report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ResultOfReportTypeSectionDto>> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId);
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeSectionDto> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get list of all sections in a report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ResultOfReportTypeSectionDto>> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeSectionDto> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// update a Report-Type sction Activeness state.
@@ -1384,7 +1384,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get list of all sections in a report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ResultOfReportTypeSectionDto>> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId)
+        public virtual System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeSectionDto> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId)
         {
             return GetReportTypeSectionsByReportTypeAsync(reportTypeId, System.Threading.CancellationToken.None);
         }
@@ -1394,7 +1394,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get list of all sections in a report type.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ResultOfReportTypeSectionDto>> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfIEnumerableOfReportTypeSectionDto> GetReportTypeSectionsByReportTypeAsync(System.Guid reportTypeId, System.Threading.CancellationToken cancellationToken)
         {
             if (reportTypeId == null)
                 throw new System.ArgumentNullException("reportTypeId");
@@ -1435,7 +1435,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<ResultOfReportTypeSectionDto>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfIEnumerableOfReportTypeSectionDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6177,6 +6177,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
 
         [Newtonsoft.Json.JsonProperty("reportTypeId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Guid ReportTypeId { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfIEnumerableOfReportTypeSectionDto : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<ReportTypeSectionDto> Data { get; set; }
 
     }
 
