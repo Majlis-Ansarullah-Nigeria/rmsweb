@@ -45,6 +45,8 @@ public partial class ReportTypeSections
             },
             createFunc: async prod =>
             {
+                var reportTypeId = Guid.Parse(Id);
+                prod.ReportTypeId = reportTypeId;
                 await ReportTypeSectionsClient.CreateReportTypeSectionAsync(prod.Adapt<CreateReportTypeSectionRequest>());
             },
             updateFunc: async (id, prod) =>
