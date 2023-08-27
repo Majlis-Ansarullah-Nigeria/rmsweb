@@ -19,35 +19,30 @@ public partial class ReportTypeSectionQuestions
     protected Task<AuthenticationState> AuthState { get; set; } = default!;
     [Inject]
     protected IAuthorizationService AuthService { get; set; } = default!;
+
     [Parameter]
-    public Guid ReportTypeSectionId { get; set; }
+    public string ReportTypeSectionId { get; set; } = default!;
 
     [Inject]
     protected ISectionQuestionServicesClient SectionQuestionServicesClient { get; set; } = default!;
 
     protected EntityServerTableContext<QuestionDto, Guid, ReportQuestionRequest> Context { get; set; } = default!;
 
-    private string _title = string.Empty;
-    private string _description = string.Empty;
-
-    private string _searchString = string.Empty;
-
-    private bool _canEditUsers;
-    private bool _canSearchRoles;
+   
     private bool _loaded;
-    private bool _canExportUsers;
-    private bool _canViewRoles;
+    //private bool _canExportUsers;
+    //private bool _canViewRoles;
 
     protected override async Task OnInitializedAsync()
     {
-        var user = (await AuthState).User;
-        _canExportUsers = await AuthService.HasPermissionAsync(user, FSHAction.Export, FSHResource.Users);
-        _canViewRoles = await AuthService.HasPermissionAsync(user, FSHAction.View, FSHResource.UserRoles);
+        //var user = (await AuthState).User;
+        //_canExportUsers = await AuthService.HasPermissionAsync(user, FSHAction.Export, FSHResource.Users);
+        //_canViewRoles = await AuthService.HasPermissionAsync(user, FSHAction.View, FSHResource.UserRoles);
 
         Context = new(
          entityName: L["Question"],
             entityNamePlural: L["Questions"],
-            entityResource: FSHResource.Questions,
+            //entityResource: FSHResource.Questions,
             fields: new()
             {
                 new(question => question.Text, L["Detail"]),
@@ -60,19 +55,27 @@ public partial class ReportTypeSectionQuestions
             canDeleteEntityFunc: e => false,
             searchFunc: async filter =>
             {
-                var returnObject = new PaginationResponse<ReportQuestionsModel>();
-                var result = await SectionQuestionServicesClient.GetSectionQuestionsBySectionIdAsync(ReportTypeSectionId, "1");
+               // var returnObject = new PaginationResponse<ReportQuestionsModel>();
+                var result = await SectionQuestionServicesClient.GetSectionQuestionsBySectionIdAsync(Guid.Parse(ReportTypeSectionId), "1");
                 return result.Adapt<PaginationResponse<QuestionDto>>();
             },
             exportAction: string.Empty);
 
     }
 
-    private void ViewProfile(in Guid questionId) =>
+    private void EditQuestion(in Guid questionId) =>
        Navigation.NavigateTo($"/sectionquestionservices/{questionId}/EditQuestion");
 
-    private void ManageRoles(in Guid userId) =>
-       Navigation.NavigateTo($"/users/{userId}/roles");
+    public enum QuestionInputType
+    {
+        TextInput,
+        Checkbox,
+        Integer,
+        Dropdown,
+        Radio,
+        Date,
+        File
+    }
 
 }
 
