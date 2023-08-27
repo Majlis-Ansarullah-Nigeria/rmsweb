@@ -1,13 +1,7 @@
-﻿using FSH.WebApi.Shared.Authorization;
-using Mapster;
-using Microsoft.AspNetCore.Authorization;
+﻿using Mapster;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using rmsweb.Client.Components.EntityTable;
 using rmsweb.Client.Infrastructure.ApiClient;
-using rmsweb.Client.Infrastructure.Auth;
-using rmsweb.Client.Shared;
-using static MudBlazor.CategoryTypes;
 
 namespace rmsweb.Client.Pages.Report;
 public partial class ReportTypeSections
@@ -39,6 +33,7 @@ public partial class ReportTypeSections
             {
                 new(prod => prod.Name, L["Name"], "Name"),
                 new(prod => prod.Description, L["Description"], "Description"),
+                new(prod => prod.ReportTypeId, L["ReportTypeId"], "ReportTypeId"),
             },
             enableAdvancedSearch: true,
             idFunc: reportType => reportType.Id,
