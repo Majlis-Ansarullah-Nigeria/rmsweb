@@ -1,19 +1,15 @@
 ﻿@page "/reportquestions/{ReportTypeId}"
 @attribute [MustHavePermission(FSHAction.View, FSHResource.Questions)]
 
-@inject IStringLocalizer<SectionQuestionServices> L
+@inject IStringLocalizer<ReportTypeSectionQuestions> L
 
 <FshTitle Title="@L["Questions"]" Description="@L["Manage Report QUestions"]" />
 
-<EntityTable TEntity="ReportQuestionsModel" TId="Guid" TRequest="ReportQuestionRequest" Context="@Context" >
+<EntityTable TEntity="QuestionDto" TId="Guid" TRequest="ReportQuestionRequest" Context="@Context" >
     <ExtraActions>
 
-        <MudMenuItem OnClick="(() => ViewProfile())">@L["View Profile"]</MudMenuItem>
+        <MudMenuItem OnClick="(() => ViewProfile(context.Id))">@L["View Profile"]</MudMenuItem>
 
-        @if (_canViewRoles)
-        {
-            <MudMenuItem OnClick="(() => ManageRoles(context.Id))">@L["Manage Roles"]</MudMenuItem>
-        }
     </ExtraActions>
 
     <EditFormContent>

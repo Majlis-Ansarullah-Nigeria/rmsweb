@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace rmsweb.Client.Pages.SectionQuestionServices;
 
-public partial class SectionQuestionServices
+public partial class ReportTypeSectionQuestions
 {
 
     [CascadingParameter]
@@ -20,12 +20,12 @@ public partial class SectionQuestionServices
     [Inject]
     protected IAuthorizationService AuthService { get; set; } = default!;
     [Parameter]
-    public Guid ReportTypeId { get; set; }
+    public Guid ReportTypeSectionId { get; set; }
 
     [Inject]
     protected ISectionQuestionServicesClient SectionQuestionServicesClient { get; set; } = default!;
 
-    protected EntityServerTableContext<ReportQuestionsModel, Guid, ReportQuestionRequest> Context { get; set; } = default!;
+    protected EntityServerTableContext<QuestionDto, Guid, ReportQuestionRequest> Context { get; set; } = default!;
 
     private string _title = string.Empty;
     private string _description = string.Empty;
@@ -51,10 +51,9 @@ public partial class SectionQuestionServices
             fields: new()
             {
                 new(question => question.Text, L["Detail"]),
-                new(question => question.Point, L["Point"])
+                new(question => question.Points, L["Point"])
 
             },
-            idFunc: question => question.ReportTypeId,
             hasExtraActionsFunc: () => true,
             canUpdateEntityFunc: e => false,
             createAction: string.Empty,
@@ -62,8 +61,8 @@ public partial class SectionQuestionServices
             searchFunc: async filter =>
             {
                 var returnObject = new PaginationResponse<ReportQuestionsModel>();
-                var result = await SectionQuestionServicesClient.GetReportTypeQuestionsAsync(ReportTypeId, "1");
-                return result.Data.Adapt<PaginationResponse<ReportQuestionsModel>>();
+                var result = await SectionQuestionServicesClient.GetSectionQuestionsBySectionIdAsync(ReportTypeSectionId, "1");
+                return result.Adapt<PaginationResponse<QuestionDto>>();
             },
             exportAction: string.Empty);
 
