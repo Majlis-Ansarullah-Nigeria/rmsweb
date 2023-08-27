@@ -33,7 +33,6 @@ public partial class ReportTypeSections
             {
                 new(prod => prod.Name, L["Name"], "Name"),
                 new(prod => prod.Description, L["Description"], "Description"),
-                new(prod => prod.ReportTypeId, L["ReportTypeId"], "ReportTypeId"),
             },
             enableAdvancedSearch: true,
             idFunc: reportType => reportType.Id,
@@ -45,6 +44,8 @@ public partial class ReportTypeSections
             },
             createFunc: async prod =>
             {
+                var reportTypeId = Guid.Parse(Id);
+                prod.ReportTypeId = reportTypeId;
                 await ReportTypeSectionsClient.CreateReportTypeSectionAsync(prod.Adapt<CreateReportTypeSectionRequest>());
             },
             updateFunc: async (id, prod) =>
