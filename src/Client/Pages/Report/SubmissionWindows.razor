@@ -1,0 +1,31 @@
+﻿@page "/report/submissionwindows"
+@*@attribute [MustHavePermission(FSHAction.View, FSHResource.UserRoles)]*@
+
+@inject IStringLocalizer<SubmissionWindow> L
+
+<FshTitle Title="@L["SubmissionWindows"]" Description="@L["Submission Windows."]" />
+
+<EntityTable @ref="_table" TEntity="SubmissionWindowDto" TId="Guid" TRequest="SubmissionWindowViewModel" Context="@Context">
+    <ExtraActions>
+        @*<MudMenuItem OnClick="(() => ManageReportSections(context.Id))">@L["Manage Report Type Sections"]</MudMenuItem>*@
+    </ExtraActions>
+
+    <EditFormContent>
+        <MudItem xs="12" md="6">
+            <MudTextField Label="@L["Name"]" For="@(() => context.SubmissionWindowDataDto.Name)" @bind-Value="context.SubmissionWindowDataDto.Name" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField Label="@L["StartDate"]" For="@(() => context.SubmissionWindowDataDateDto.StartDate)"
+            @bind-Value="context.SubmissionWindowDataDateDto.StartDate" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField Label="@L["IsLocked"]" For="@(() => context.IsLocked)"
+            @bind-Value="context.IsLocked" />
+        </MudItem>
+        @*<MudItem xs="12" md="6">
+        <MudTextField Label="@L["Report Tag"]" For="@(() => context.ReportTag)"
+        @bind-Value="context.ReportTag" />
+        </MudItem>*@
+    </EditFormContent>
+
+</EntityTable>
