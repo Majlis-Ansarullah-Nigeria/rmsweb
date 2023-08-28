@@ -1,13 +1,7 @@
-﻿using FSH.WebApi.Shared.Authorization;
-using Mapster;
+﻿using Mapster;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using MudBlazor;
 using rmsweb.Client.Components.EntityTable;
 using rmsweb.Client.Infrastructure.ApiClient;
-using rmsweb.Client.Infrastructure.Common;
-using System.ComponentModel;
-using static rmsweb.Client.Pages.Report.ReportTypes;
 
 namespace rmsweb.Client.Pages.Report;
 public partial class ReportTypes
@@ -40,9 +34,9 @@ public partial class ReportTypes
             },
             createFunc: async prod =>
             {
-                string e = prod.ReportTag.ToString();
-                prod.ReportTag = (ReportTypeEnum)Enum.Parse(typeof(ReportTypeEnum), e);
-                var t = (int)prod.ReportTag;
+                //string e = prod.ReportTag.ToString();
+                //prod.ReportTag = (ReportTypeEnum)Enum.Parse(typeof(ReportTypeEnum), e);
+                //var t = (int)prod.ReportTag;
                 await ReportTypesClient.CreateReportTypeAsync(prod.Adapt<CreateReportTypeRequest>());
             },
             updateFunc: async (id, prod) =>
@@ -105,7 +99,6 @@ public partial class ReportTypes
 
 public class ReportTypeViewModel
 {
-    public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
     public ReportTypeEnum ReportTag { get; set; }

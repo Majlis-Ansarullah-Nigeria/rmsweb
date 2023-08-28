@@ -30,10 +30,10 @@
 
                 }
             </MudSelect>*@
-            <MudSelect Margin="Margin.Dense" T="string" Label="Report Tag" Variant="Variant.Text">
+            <MudSelect Margin="Margin.Dense" T="string" Label="Report Tag" Variant="Variant.Text" >
                 @foreach (ReportTypeEnum reportType in Enum.GetValues(typeof(ReportTypeEnum)))
                 {
-                    <MudSelectItem  Value="@context.ReportTag">@reportType.ToString()</MudSelectItem>
+                    <MudSelectItem Value="reportType.ToString()">@reportType.ToString()</MudSelectItem>
 
                 }
             </MudSelect>
