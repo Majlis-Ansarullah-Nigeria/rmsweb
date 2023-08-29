@@ -2595,12 +2595,18 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfSubmissionWindow> UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Create a new  submission window .
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model);
+        System.Threading.Tasks.Task<SubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Create a new  submission window .
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<SubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfPaginatedResultOfSubmissionWindow> GetSubmissionWindowAsync(string api_version, PaginationFilter filter);
@@ -2743,15 +2749,21 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// Create a new  submission window .
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model)
+        public virtual System.Threading.Tasks.Task<SubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model)
         {
             return AddSubmissionWindowAsync(api_version, model, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Create a new  submission window .
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken)
         {
             if (model == null)
                 throw new System.ArgumentNullException("model");
@@ -2810,7 +2822,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfSubmissionWindow>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<SubmissionWindow>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6540,14 +6552,20 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CreateSubmissionWindowRequest
     {
-        [Newtonsoft.Json.JsonProperty("reportSubmissionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid ReportSubmissionId { get; set; }
-
         [Newtonsoft.Json.JsonProperty("startingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime StartingDate { get; set; }
 
         [Newtonsoft.Json.JsonProperty("endingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime EndingDate { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTypeId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ReportTypeId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("month", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Month { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("year", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Year { get; set; }
 
     }
 
@@ -7023,7 +7041,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ApiException<TResult> : ApiException
-    { 
+    {
         public TResult Result { get; private set; }
 
         public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception innerException)
