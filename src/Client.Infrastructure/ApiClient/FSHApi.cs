@@ -6801,12 +6801,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     public partial class ResultOfIEnumerableOfSubmissionWindowDto : Result
     {
         [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<SubmissionWindowDto> Data { get; set; }
+        public System.Collections.Generic.ICollection<SubmissionWindowsDto> Data { get; set; }
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SubmissionWindowDto
+    public partial class SubmissionWindowsDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Guid? Id { get; set; }
@@ -6838,7 +6838,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     public partial class ResultOfSubmissionWindowDto : Result
     {
         [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public SubmissionWindowDto Data { get; set; }
+        public SubmissionWindowsDto Data { get; set; }
 
     }
 

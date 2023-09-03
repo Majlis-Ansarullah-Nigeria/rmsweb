@@ -1,137 +1,84 @@
-﻿//using FSH.WebApi.Shared.Authorization;
-//using FSH.WebApi.Shared.Multitenancy;
-//using Mapster;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Components;
-//using Microsoft.AspNetCore.Components.Authorization;
-//using MudBlazor;
-//using rmsweb.Client.Components.EntityTable;
-//using rmsweb.Client.Infrastructure.ApiClient;
-//using rmsweb.Client.Infrastructure.Auth;
-//using rmsweb.Client.Shared;
-//using System.Security.Claims;
+﻿using Mapster;
+using Microsoft.AspNetCore.Components;
+using rmsweb.Client.Components.EntityTable;
+using rmsweb.Client.Infrastructure.ApiClient;
 
-//namespace rmsweb.Client.Pages.ReportSubmission;
-//public partial class ReportSubmission
-//{
-//    private ReportQuestionsModel Report { get; set; }
-//    [Inject]
-//    protected ISectionQuestionServicesClient Client { get; set; } = default!;
+namespace rmsweb.Client.Pages.ReportSubmission;
+public partial class ReportSubmission
+{
+    [Inject]
+    protected ISubmissionWindowClient SubmissionWindowClient { get; set; } = default!;
 
+    protected EntityServerTableContext<ReportSubmissionDto, Guid, ReportSubmissionViewModel> Context { get; set; } = default!;
+    private bool _canViewRoles;
 
-//    public string _title = string.Empty;
-//    public string _description = string.Empty;
+    private EntityTable<ReportSubmissionDto, Guid, ReportSubmissionViewModel> _table = default!;
 
-    //private string _searchString = string.Empty;
-    //private bool _loaded;
-    //protected EntityServerTableContext<ReportTypeDto, Guid, GetAllPrintedCardRequests> Context { get; set; } = default!;
+    protected override void OnInitialized() =>
+        Context = new(
+            entityName: L["ReportSubmission"],
+            entityNamePlural: L["ReportSubmissions"],
+            // entityResource: FSHResource.Products,
+            fields: new()
+            {
+                new(prod => prod.Name, L["Name"], "Name"),
+            },
+            enableAdvancedSearch: true,
+            idFunc: reportType => reportType.Id,
+            searchFunc: async filter =>
+            {
+                var result = await SubmissionWindowClient.GetSubmissionWindowsAsync("1");
+                return result.Adapt<PaginationResponse<ReportSubmissionDto>>();
+            });
 
-//    private EntityTable<PrintedCardRequestResponseModel, Guid, GetAllPrintedCardRequests> _table = default!;
+    // Advanced Search
 
-//    protected override async Task OnInitializedAsync()
-//    {
-//        Context = new(
-//           entityName: L["Card"],
-//           entityNamePlural: L["PrintedCardsExports"],
-//           entityResource: "Report Types",
-//           fields: new()
-//           {
-//                new(prod => prod.Name, L["Name"], "Name"),
-//                new(prod => prod.Description, L["Description"], "Description")
-//           },
-//           enableAdvancedSearch: true,
-//           hasExtraActionsFunc: () => false,
-//           idFunc: prod => Guid.Parse(prod.ChandaNo),
-//           canUpdateEntityFunc: e => false,
-//           searchFunc: async (filter) =>
-//           {
-//              /* var cardRequestFilter = filter.Adapt<GetAllPrintedCardRequests>();
-//               var result = await CardRequestsClient.GetPrintedCardRequestAsync(cardRequestFilter);*/
-//               return new();
-//           }
-//          /* deleteFunc: async id => await DilasClient.DeleteAsync(id)*/);
+    private Guid _searchBrandId;
+    private Guid SearchBrandId
+    {
+        get => _searchBrandId;
+        set
+        {
+            _searchBrandId = value;
+            _ = _table.ReloadDataAsync();
+        }
+    }
 
-//        // Advanced Search
-//        // await GenerateMockDataAsync();
-//        _loaded = true;
-//    }
+    private decimal _searchMinimumRate;
+    private decimal SearchMinimumRate
+    {
+        get => _searchMinimumRate;
+        set
+        {
+            _searchMinimumRate = value;
+            _ = _table.ReloadDataAsync();
+        }
+    }
 
-//    private async Task GenerateMockDataAsync()
-//    {
-//        Guid type = new Guid("2d0d5733-5b43-485c-daee-08db7e658745");
-//        var report = await Client.GetReportTypeQuestionsAsync(type, "1");
-//        Report = report.Data;
+    private decimal _searchMaximumRate = 9999;
+    private decimal SearchMaximumRate
+    {
+        get => _searchMaximumRate;
+        set
+        {
+            _searchMaximumRate = value;
+            _ = _table.ReloadDataAsync();
+        }
+    }
 
-//    }
+    private void MakeSubmission(in Guid submissionId) =>
+       Navigation.NavigateTo($"/reportSubmissions/{submissionId}");
+}
 
+public class ReportSubmissionViewModel
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+}
 
-
-//    public enum QuestionInputType
-//    {
-//        TextInput,
-//        Checkbox,
-//        Integer,
-//        Dropdown,
-//        Radio,
-//        Date,
-//        File
-//    }
-
-//    private void SaveSection(Sections section)
-//    {
-//        // Perform save operation for the specific section
-//        // You can access the questions and answers using section.Questions
-//        // Example: section.Questions[0].Answer
-//    }
-
-//    private void SaveReport()
-//    {
-//        // Perform save operation for the entire report
-//        // You can access the sections, questions, and answers using Report.Sections
-//        // Example: Report.Sections[0].Questions[0].Answer
-//    }
-
-//    private bool IsQuestionAnswered(ReportSectionQuestion question)
-//    {
-//        switch (question.ResponseType)
-//        {
-//            case ResponseType.Checkbox:
-//                return true; // Checkbox type always considered answered
-//            case ResponseType.Integer:
-//            //  return question.AnswerInteger.HasValue;
-//            default:
-//                return !string.IsNullOrWhiteSpace(question.Text);
-//                // return !string.IsNullOrWhiteSpace(question.Answer);
-//        }
-//    }
-
-//    private void HandleFileUpload(/*IMudFileUploadEntry[] files*/)
-//    {
-//        // Handle file upload logic here
-//    }
-//    private Color GetGroupBadgeColor(int selected, int all)
-//    {
-//        if (selected == 0)
-//            return Color.Error;
-
-//        if (selected == all)
-//            return Color.Success;
-
-//        return Color.Info;
-//    }
-
-//    private bool Search(PermissionViewModel permission) =>
-//        string.IsNullOrWhiteSpace(_searchString)
-//            || permission.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase) is true
-//            || permission.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase) is true;
-//}
-
-//public record PermissionViewModel : FSHPermission
-//{
-//    public bool Enabled { get; set; }
-
-//    public PermissionViewModel(string Description, string Action, string Resource, bool IsBasic = false, bool IsRoot = false)
-//        : base(Description, Action, Resource, IsBasic, IsRoot)
-//    {
-//    }
-//}
+public class ReportSubmissionDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
+}
