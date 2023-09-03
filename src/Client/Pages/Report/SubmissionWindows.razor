@@ -12,20 +12,42 @@
 
     <EditFormContent>
         <MudItem xs="12" md="6">
-            <MudTextField Label="@L["Name"]" For="@(() => context.Name)" @bind-Value="context.Name" />
+            <MudItem xs="12" md="6">
+                <MudSelect Margin="Margin.Dense" T="string" Label="Name" Variant="Variant.Text" For="@(() => context.Name)" @bind-Value="context.Name">
+                    @*@foreach (var item in @(() => GetAllReportTypesAsync)
+                    {
+                        <MudSelectItem Value="@i.ToString()">@i.ToString()</MudSelectItem>
+                    *@}
+                </MudSelect>
+
+            </MudItem>
         </MudItem>
         <MudItem xs="12" md="6">
-            <MudTextField Label="@L["StartDate"]" For="@(() => context.StartingDate)"
+            <MudSelect Margin="Margin.Dense" T="string" Label="Month" Variant="Variant.Text" For="@(() => context.SubmissionWindowMonth)">
+                @foreach (SubmissionWindowMonthEnum submissionwindow in Enum.GetValues(typeof(SubmissionWindowMonthEnum)))
+                {
+                    <MudSelectItem Value="submissionwindow.ToString()">@submissionwindow.ToString()</MudSelectItem>
+
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudSelect Margin="Margin.Dense" T="string" Label="Year" Variant="Variant.Text">
+                @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 100; i++)
+                {
+                    <MudSelectItem Value="@i.ToString()">@i.ToString()</MudSelectItem>
+                }
+            </MudSelect>
+
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField Label="@L["Start Date (format: mm/dd/yyy)"]" For="@(() => context.StartingDate)"
             @bind-Value="context.StartingDate" />
         </MudItem>
         <MudItem xs="12" md="6">
-            <MudTextField Label="@L["IsLocked"]" For="@(() => context.IsLocked)"
-            @bind-Value="context.IsLocked" />
+            <MudTextField Label="@L["End Date (format: mm/dd/yyy)"]" For="@(() => context.EndingDate)"
+            @bind-Value="context.EndingDate" />
         </MudItem>
-        @*<MudItem xs="12" md="6">
-        <MudTextField Label="@L["Report Tag"]" For="@(() => context.ReportTag)"
-        @bind-Value="context.ReportTag" />
-        </MudItem>*@
     </EditFormContent>
 
 </EntityTable>

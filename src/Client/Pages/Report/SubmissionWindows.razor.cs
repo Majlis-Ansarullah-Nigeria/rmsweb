@@ -11,10 +11,10 @@ namespace rmsweb.Client.Pages.Report;
 
 public partial class SubmissionWindows
 {
-    //[Parameter]
-    //public string Id { get; set; } = default!;
     [Inject]
     protected ISubmissionWindowClient SubmissionWindowClient { get; set; } = default!;
+    [Inject]
+    protected IReportTypesClient ReportTypesClients { get; set; } = default!;
 
     protected EntityServerTableContext<SubmissionWindowDto, Guid, SubmissionWindowViewModel> Context { get; set; } = default!;
 
@@ -90,6 +90,11 @@ public partial class SubmissionWindows
         }
     }
 
+    public async Task<ICollection<rmsweb.Client.Infrastructure.ApiClient.ReportTypeDto>> GetAllReportTypesAsync()
+    {
+        var result = await ReportTypesClients.GetReportTypesAsync();
+        return result.Data;
+    }
     private void ViewReport(in Guid reportTypeId) =>
        Navigation.NavigateTo($"/reportTypes/{reportTypeId}");
 
@@ -102,11 +107,13 @@ public class SubmissionWindowViewModel
     public Guid Id { get; set; }
     public string Name { get; set; }
     public int Month { get; set; }
+    public string SubmissionWindowMonth { get; set; }
     public int Year { get; set; }
+    public string SubmissionWindowYear{ get; set; }
     public Guid ReportTypeId { get; set; }
     public bool IsLocked { get; set; }
-    public DateTime StartingDate { get; set; }
-    public DateTime EndingDate { get; set; }
+    public DateTime StartingDate { get; set; } = DateTime.Now.AddDays(1);
+    public DateTime EndingDate { get; set; } = DateTime.Now.AddMonths(1);
 }
 
 public class SubmissionWindowDto
@@ -119,4 +126,20 @@ public class SubmissionWindowDto
     public bool IsLocked { get; set; }
     public DateTime StartingDate { get; set; }
     public DateTime EndingDate { get; set; }
+}
+
+public enum SubmissionWindowMonthEnum
+{
+    January = 1,
+    February,
+    March,
+    April,
+    May,
+    June,
+    July,
+    August,
+    September,
+    October,
+    November,
+    December
 }
