@@ -24,7 +24,7 @@ public partial class ReportSubmission
 
     private string _searchString = string.Empty;
     private bool _loaded;
-    protected EntityServerTableContext<PrintedCardRequestResponseModel, Guid, GetAllPrintedCardRequests> Context { get; set; } = default!;
+    protected EntityServerTableContext<ReportTypeDto, Guid, GetAllPrintedCardRequests> Context { get; set; } = default!;
 
     private EntityTable<PrintedCardRequestResponseModel, Guid, GetAllPrintedCardRequests> _table = default!;
 
