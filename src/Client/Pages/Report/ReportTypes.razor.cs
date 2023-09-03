@@ -33,7 +33,7 @@ public partial class ReportTypes
             idFunc: reportType => reportType.Id,
             searchFunc: async filter =>
             {
-                var result = await ReportTypesClient.GetReportTypesAsync(filter);
+                var result = await ReportTypesClient.GetReportTypesAsync();
                 return result.Adapt<PaginationResponse<ReportTypeDto>>();
             },
             createFunc: async prod =>

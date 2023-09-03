@@ -1663,47 +1663,83 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial interface ISectionQuestionServicesClient : IApiService
+    public partial interface ISectionQuestionClient : IApiService
     {
+        /// <summary>
+        /// add a question
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfBoolean> AddQuestionAsync(string api_version, ReportQuestionRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// add a question
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfBoolean> AddQuestionAsync(string api_version, ReportQuestionRequest request, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// get a specific question by id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<QuestionDto> GetQuestionAsync(System.Guid questionId, string api_version);
+        System.Threading.Tasks.Task<ResultOfQuestionDto> GetQuestionAsync(System.Guid questionId, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get a specific question by id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<QuestionDto> GetQuestionAsync(System.Guid questionId, string api_version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfQuestionDto> GetQuestionAsync(System.Guid questionId, string api_version, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// get the questions of a section by section id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<QuestionDto>> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version);
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfQuestionDto> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get the questions of a section by section id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<QuestionDto>> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfIEnumerableOfQuestionDto> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// get all questions of a report type by report type id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfReportQuestionsModel> GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get all questions of a report type by report type id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfReportQuestionsModel> GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// update a question point
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a question point
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// update a question text
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a question text
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version, System.Threading.CancellationToken cancellationToken);
 
@@ -1723,12 +1759,12 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SectionQuestionServicesClient : ISectionQuestionServicesClient
+    public partial class SectionQuestionClient : ISectionQuestionClient
     {
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public SectionQuestionServicesClient(System.Net.Http.HttpClient httpClient)
+        public SectionQuestionClient(System.Net.Http.HttpClient httpClient)
         {
             _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
@@ -1749,6 +1785,9 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
+        /// <summary>
+        /// add a question
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<ResultOfBoolean> AddQuestionAsync(string api_version, ReportQuestionRequest request)
         {
@@ -1756,6 +1795,9 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// add a question
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<ResultOfBoolean> AddQuestionAsync(string api_version, ReportQuestionRequest request, System.Threading.CancellationToken cancellationToken)
         {
@@ -1763,7 +1805,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("request");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices?");
+            urlBuilder_.Append("api/sectionquestion/question?");
             if (api_version != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("api-version") + "=").Append(System.Uri.EscapeDataString(ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1853,21 +1895,27 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// get a specific question by id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<QuestionDto> GetQuestionAsync(System.Guid questionId, string api_version)
+        public virtual System.Threading.Tasks.Task<ResultOfQuestionDto> GetQuestionAsync(System.Guid questionId, string api_version)
         {
             return GetQuestionAsync(questionId, api_version, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get a specific question by id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<QuestionDto> GetQuestionAsync(System.Guid questionId, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfQuestionDto> GetQuestionAsync(System.Guid questionId, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (questionId == null)
                 throw new System.ArgumentNullException("questionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/getquestion/{questionId}?");
+            urlBuilder_.Append("api/sectionquestion/question/{questionId}?");
             urlBuilder_.Replace("{questionId}", System.Uri.EscapeDataString(ConvertToString(questionId, System.Globalization.CultureInfo.InvariantCulture)));
             if (api_version != null)
             {
@@ -1907,7 +1955,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<QuestionDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfQuestionDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -1934,21 +1982,27 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// get the questions of a section by section id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<QuestionDto>> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version)
+        public virtual System.Threading.Tasks.Task<ResultOfIEnumerableOfQuestionDto> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version)
         {
             return GetSectionQuestionsBySectionIdAsync(sectionId, api_version, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get the questions of a section by section id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<QuestionDto>> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfIEnumerableOfQuestionDto> GetSectionQuestionsBySectionIdAsync(System.Guid sectionId, string api_version, System.Threading.CancellationToken cancellationToken)
         {
             if (sectionId == null)
                 throw new System.ArgumentNullException("sectionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/getsectionquestionsbysectionid/{sectionId}?");
+            urlBuilder_.Append("api/sectionquestion/sectionquestionsbysectionid/{sectionId}?");
             urlBuilder_.Replace("{sectionId}", System.Uri.EscapeDataString(ConvertToString(sectionId, System.Globalization.CultureInfo.InvariantCulture)));
             if (api_version != null)
             {
@@ -1998,7 +2052,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<QuestionDto>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfIEnumerableOfQuestionDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -2025,6 +2079,9 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// get all questions of a report type by report type id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<ResultOfReportQuestionsModel> GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version)
         {
@@ -2032,6 +2089,9 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// get all questions of a report type by report type id
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<ResultOfReportQuestionsModel> GetReportTypeQuestionsAsync(System.Guid reportTypeId, string api_version, System.Threading.CancellationToken cancellationToken)
         {
@@ -2039,7 +2099,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("reportTypeId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/{reportTypeId}/questions?");
+            urlBuilder_.Append("api/sectionquestion/{reportTypeId}/questions?");
             urlBuilder_.Replace("{reportTypeId}", System.Uri.EscapeDataString(ConvertToString(reportTypeId, System.Globalization.CultureInfo.InvariantCulture)));
             if (api_version != null)
             {
@@ -2116,6 +2176,9 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// update a question point
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version)
         {
@@ -2123,6 +2186,9 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a question point
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionPointAsync(System.Guid questionId, double? point, string api_version, System.Threading.CancellationToken cancellationToken)
         {
@@ -2130,7 +2196,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("questionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/updatequestionpoint/{questionId}?");
+            urlBuilder_.Append("api/sectionquestion/questionpoint/{questionId}?");
             urlBuilder_.Replace("{questionId}", System.Uri.EscapeDataString(ConvertToString(questionId, System.Globalization.CultureInfo.InvariantCulture)));
             if (point != null)
             {
@@ -2212,6 +2278,9 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// update a question text
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version)
         {
@@ -2219,6 +2288,9 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// update a question text
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<ResultOfBoolean> UpdateQuestionTextAsync(System.Guid questionId, string text, string api_version, System.Threading.CancellationToken cancellationToken)
         {
@@ -2226,7 +2298,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("questionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/updatequestiontext/{questionId}?");
+            urlBuilder_.Append("api/sectionquestion/questiontext/{questionId}?");
             urlBuilder_.Replace("{questionId}", System.Uri.EscapeDataString(ConvertToString(questionId, System.Globalization.CultureInfo.InvariantCulture)));
             if (text != null)
             {
@@ -2331,7 +2403,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 throw new System.ArgumentNullException("state");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/sectionquestionservices/{questionId}/{state}?");
+            urlBuilder_.Append("api/sectionquestion/{questionId}/{state}?");
             urlBuilder_.Replace("{questionId}", System.Uri.EscapeDataString(ConvertToString(questionId, System.Globalization.CultureInfo.InvariantCulture)));
             urlBuilder_.Replace("{state}", System.Uri.EscapeDataString(ConvertToString(state, System.Globalization.CultureInfo.InvariantCulture)));
             if (api_version != null)
@@ -2523,12 +2595,18 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfSubmissionWindow> UpdateSubmissionWindowAsync(System.Guid updateId, string api_version, UpdateSubmissionWindowRequest updateSubmission, System.Threading.CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Create a new  submission window .
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model);
+        System.Threading.Tasks.Task<SubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Create a new  submission window .
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<SubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ResultOfPaginatedResultOfSubmissionWindow> GetSubmissionWindowAsync(string api_version, PaginationFilter filter);
@@ -2671,15 +2749,21 @@ namespace rmsweb.Client.Infrastructure.ApiClient
             }
         }
 
+        /// <summary>
+        /// Create a new  submission window .
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model)
+        public virtual System.Threading.Tasks.Task<SubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model)
         {
             return AddSubmissionWindowAsync(api_version, model, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Create a new  submission window .
+        /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ResultOfSubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SubmissionWindow> AddSubmissionWindowAsync(string api_version, CreateSubmissionWindowRequest model, System.Threading.CancellationToken cancellationToken)
         {
             if (model == null)
                 throw new System.ArgumentNullException("model");
@@ -2738,7 +2822,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         else
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfSubmissionWindow>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<SubmissionWindow>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6117,6 +6201,9 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Description { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("reportTag", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ReportTag { get; set; }
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -6228,6 +6315,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfQuestionDto : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public QuestionDto Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class QuestionDto
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -6244,6 +6339,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
 
         [Newtonsoft.Json.JsonProperty("points", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public double Points { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfIEnumerableOfQuestionDto : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<QuestionDto> Data { get; set; }
 
     }
 
@@ -6449,14 +6552,20 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CreateSubmissionWindowRequest
     {
-        [Newtonsoft.Json.JsonProperty("reportSubmissionId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid ReportSubmissionId { get; set; }
-
         [Newtonsoft.Json.JsonProperty("startingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime StartingDate { get; set; }
 
         [Newtonsoft.Json.JsonProperty("endingDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime EndingDate { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("reportTypeId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid ReportTypeId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("month", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Month { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("year", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Year { get; set; }
 
     }
 

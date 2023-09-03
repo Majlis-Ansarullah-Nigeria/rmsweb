@@ -1,13 +1,7 @@
-﻿using FSH.WebApi.Shared.Authorization;
-using Mapster;
-using Microsoft.AspNetCore.Authorization;
+﻿using Mapster;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using rmsweb.Client.Components.EntityTable;
 using rmsweb.Client.Infrastructure.ApiClient;
-using rmsweb.Client.Infrastructure.Auth;
-using rmsweb.Client.Shared;
-using static MudBlazor.CategoryTypes;
 
 namespace rmsweb.Client.Pages.Report;
 public partial class ReportTypeSections
@@ -50,6 +44,8 @@ public partial class ReportTypeSections
             },
             createFunc: async prod =>
             {
+                var reportTypeId = Guid.Parse(Id);
+                prod.ReportTypeId = reportTypeId;
                 await ReportTypeSectionsClient.CreateReportTypeSectionAsync(prod.Adapt<CreateReportTypeSectionRequest>());
             },
             updateFunc: async (id, prod) =>
