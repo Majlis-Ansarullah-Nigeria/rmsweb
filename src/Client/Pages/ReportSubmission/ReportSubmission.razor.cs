@@ -22,9 +22,9 @@
 //    public string _title = string.Empty;
 //    public string _description = string.Empty;
 
-    private string _searchString = string.Empty;
-    private bool _loaded;
-    protected EntityServerTableContext<ReportTypeDto, Guid, GetAllPrintedCardRequests> Context { get; set; } = default!;
+    //private string _searchString = string.Empty;
+    //private bool _loaded;
+    //protected EntityServerTableContext<ReportTypeDto, Guid, GetAllPrintedCardRequests> Context { get; set; } = default!;
 
 //    private EntityTable<PrintedCardRequestResponseModel, Guid, GetAllPrintedCardRequests> _table = default!;
 
