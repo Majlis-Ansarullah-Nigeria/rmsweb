@@ -308,4 +308,5 @@ public partial class EntityTable<TEntity, TId, TRequest>
             await ReloadDataAsync();
         }
     }
+    
 }
