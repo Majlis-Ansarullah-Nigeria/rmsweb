@@ -28,27 +28,23 @@ public partial class SubmissionWindows
             // entityResource: FSHResource.Products,
             fields: new()
             {
-                new(submissionwindow => submissionwindow.SubmissionWindowDataDto.Name + " _ " + submissionwindow.SubmissionWindowDataDto.Year + " _ " + submissionwindow.SubmissionWindowDataDto.Month, L["Name"], "Name"),
+                new(submissionwindow => submissionwindow.Name + " _ " + submissionwindow.Year + " _ " + submissionwindow.Month, L["Name"], "Name"),
 
-                new(submissionwindow => submissionwindow.SubmissionWindowDataDateDto.StartDate + " _ " + submissionwindow.SubmissionWindowDataDateDto.EndDate, L["StartDate - EndDate"], "StartDate - EndDate"),
+                new(submissionwindow => submissionwindow.StartingDate + " _ " + submissionwindow.EndingDate, L["StartDate - EndDate"], "StartDate - EndDate"),
+
+                new(submissionwindow => DateTime.Now >= submissionwindow.StartingDate && DateTime.Now <= submissionwindow.EndingDate ? "Current" : "Previous", L["Status"], "Status"),
 
                 new(submissionwindow => submissionwindow.IsLocked, L["IsLocked"], "IsLocked"),
             },
             enableAdvancedSearch: true,
-            idFunc: reportType => reportType.SubmissionWindowId,
+            idFunc: submissionWindow => submissionWindow.Id,
             searchFunc: async filter =>
             {
-                //var result = await SubmissionWindowClient.GetSubmissionWindowAsync("1", filter);
-                //return result.Adapt<PaginationResponse<SubmissionWindowDto>>();
-                var submissionWindowDto = new List<SubmissionWindowDto>
-                {
-                    new SubmissionWindowDto(),
-                    new SubmissionWindowDto(),
-                    new SubmissionWindowDto(),
-                };
-                var paginated = submissionWindowDto.Adapt<PaginationResponse<SubmissionWindowDto>>();
-                paginated.Data = submissionWindowDto;
-                return paginated;
+                var result = await SubmissionWindowClient.GetSubmissionWindowsAsync("1");
+                return result.Adapt<PaginationResponse<SubmissionWindowDto>>();
+                //var paginated = submissionWindowDto.Adapt<PaginationResponse<SubmissionWindowDto>>();
+                //paginated.Data = submissionWindowDto;
+                //return paginated;
             },
             createFunc: async prod =>
             {
@@ -58,17 +54,6 @@ public partial class SubmissionWindows
             {
                 await SubmissionWindowClient.UpdateSubmissionWindowAsync(id, "1", prod.Adapt<UpdateSubmissionWindowRequest>());
             });
-    //exportFunc: async filter =>
-    //{
-    //    var exportFilter = filter.Adapt<ExportProductsRequest>();
-
-    //    exportFilter.BrandId = SearchBrandId == default ? null : SearchBrandId;
-    //    exportFilter.MinimumRate = SearchMinimumRate;
-    //    exportFilter.MaximumRate = SearchMaximumRate;
-
-    //    return await ProductsClient.ExportAsync(exportFilter);
-    //},
-    //deleteFunc: async id => await ProductsClient.DeleteAsync(id));
 
     // Advanced Search
 
@@ -114,51 +99,24 @@ public partial class SubmissionWindows
 
 public class SubmissionWindowViewModel
 {
-    public SubmissionWindowDataDto SubmissionWindowDataDto { get; set; } = new SubmissionWindowDataDto
-    {
-        Name = "Majlis",
-        Month = 10,
-        Year = 2020,
-    };
-    public SubmissionWindowDataDateDto SubmissionWindowDataDateDto { get; set; } = new SubmissionWindowDataDateDto
-    {
-        StartDate = DateTime.Now,
-        EndDate = DateTime.Now.AddDays(2),
-    };
-    public Guid SubmissionWindowId { get; set; }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public int Month { get; set; }
+    public int Year { get; set; }
     public Guid ReportTypeId { get; set; }
-    public Guid ReportTypeName { get; set; }
     public bool IsLocked { get; set; }
+    public DateTime StartingDate { get; set; }
+    public DateTime EndingDate { get; set; }
 }
 
 public class SubmissionWindowDto
 {
-    public SubmissionWindowDataDto SubmissionWindowDataDto { get; set; } = new SubmissionWindowDataDto
-    {
-        Name = "Majlis",
-        Month = 10,
-        Year = 2020,
-    };
-    public SubmissionWindowDataDateDto SubmissionWindowDataDateDto { get; set; } = new SubmissionWindowDataDateDto
-    {
-        StartDate = DateTime.Now,
-        EndDate = DateTime.Now.AddDays(2),
-    };
-    public Guid SubmissionWindowId { get; set; }
-    public Guid ReportTypeId { get; set; }
-    public Guid ReportTypeName { get; set; }
-    public bool IsLocked { get; set; }
-}
-
-public class SubmissionWindowDataDto
-{
+    public Guid Id { get; set; }
     public string Name { get; set; }
     public int Month { get; set; }
     public int Year { get; set; }
-}
-
-public class SubmissionWindowDataDateDto
-{
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public Guid ReportTypeId { get; set; }
+    public bool IsLocked { get; set; }
+    public DateTime StartingDate { get; set; }
+    public DateTime EndingDate { get; set; }
 }

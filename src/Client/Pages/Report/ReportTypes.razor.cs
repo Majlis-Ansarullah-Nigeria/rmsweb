@@ -1,7 +1,12 @@
 ﻿using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
+using rmsweb.Client.Components.Dialogs;
 using rmsweb.Client.Components.EntityTable;
 using rmsweb.Client.Infrastructure.ApiClient;
+using rmsweb.Client.Shared;
+using System.Security.Cryptography;
 
 namespace rmsweb.Client.Pages.Report;
 public partial class ReportTypes
@@ -22,7 +27,7 @@ public partial class ReportTypes
             fields: new()
             {
                 new(prod => prod.Name, L["Name"], "Name"),
-                new(prod => prod.Description, L["Description"], "Description"),
+                //new(prod => prod.Description, L["Description"], "Description"),
                 new(prod => prod.ReportTag.ToString(), L["Report Tag"], "Report Tag"),
             },
             enableAdvancedSearch: true,
@@ -34,26 +39,16 @@ public partial class ReportTypes
             },
             createFunc: async prod =>
             {
-                //string e = prod.ReportTag.ToString();
-                //prod.ReportTag = (ReportTypeEnum)Enum.Parse(typeof(ReportTypeEnum), e);
-                //var t = (int)prod.ReportTag;
+                var reportTag = (ReportTypeEnum)Enum.Parse(typeof(ReportTypeEnum), prod.ReportTagString);
+                prod.ReportTag = reportTag;
                 await ReportTypesClient.CreateReportTypeAsync(prod.Adapt<CreateReportTypeRequest>());
             },
             updateFunc: async (id, prod) =>
             {
+                var reportTag = (ReportTypeEnum)Enum.Parse(typeof(ReportTypeEnum), prod.ReportTagString);
+                prod.ReportTag = reportTag;
                 await ReportTypesClient.UpdateReportTypeAsync(id, prod.Adapt<UpdateReportTypeRequest>());
             });
-            //exportFunc: async filter =>
-            //{
-            //    var exportFilter = filter.Adapt<ExportProductsRequest>();
-
-            //    exportFilter.BrandId = SearchBrandId == default ? null : SearchBrandId;
-            //    exportFilter.MinimumRate = SearchMinimumRate;
-            //    exportFilter.MaximumRate = SearchMaximumRate;
-
-            //    return await ProductsClient.ExportAsync(exportFilter);
-            //},
-            //deleteFunc: async id => await ProductsClient.DeleteAsync(id));
 
     // Advanced Search
 
@@ -95,12 +90,26 @@ public partial class ReportTypes
 
     private void ManageReportSections(in Guid reportTypeId) =>
         Navigation.NavigateTo($"/reportTypes/{reportTypeId}/sections");
+
+    private async Task View(ReportTypeDto entity)
+    {
+        _ = Context.IdFunc ?? throw new InvalidOperationException("IdFunc can't be null!");
+
+        string deleteContent = L[entity.Description];
+        var parameters = new DialogParameters
+        {
+            { nameof(DeleteConfirmation.ContentText), string.Format(deleteContent, Context.EntityName) }
+        };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+        var dialog = DialogService.Show<DeleteConfirmation>(L["test"], parameters, options);
+    }
 }
 
 public class ReportTypeViewModel
 {
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
+    public string ReportTagString { get; set; }
     public ReportTypeEnum ReportTag { get; set; }
 }
 

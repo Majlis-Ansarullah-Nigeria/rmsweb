@@ -9,6 +9,7 @@
 
 <EntityTable @ref="_table" TEntity="ReportTypeDto" TId="Guid" TRequest="ReportTypeViewModel" Context="@Context">
     <ExtraActions>
+        <MudMenuItem OnClick="(() => View(context))">@L["View Details"]</MudMenuItem>
         <MudMenuItem OnClick="(() => ManageReportSections(context.Id))">@L["Manage Report Type Sections"]</MudMenuItem>
     </ExtraActions>
 
@@ -23,14 +24,7 @@
         
         <!-- Add the enum dropdown here -->
         <MudItem xs="12" md="6">
-            @*<MudSelect Label="@L["Report Tag"]" For="@(() => context.ReportTag)" @bind-Value="context.ReportTag">
-                @foreach (ReportTypeEnum reportType in Enum.GetValues(typeof(ReportTypeEnum)))
-                {
-                   <MudOption TValue="ReportTypeEnum" Value="@reportType">@reportType</MudOption><br />
-
-                }
-            </MudSelect>*@
-            <MudSelect Margin="Margin.Dense" T="string" Label="Report Tag" Variant="Variant.Text" >
+            <MudSelect Margin="Margin.Dense" T="string" Label="Report Tag" Variant="Variant.Text" For="@(() => context.ReportTagString)" @bind-Value="context.ReportTagString">
                 @foreach (ReportTypeEnum reportType in Enum.GetValues(typeof(ReportTypeEnum)))
                 {
                     <MudSelectItem Value="reportType.ToString()">@reportType.ToString()</MudSelectItem>
