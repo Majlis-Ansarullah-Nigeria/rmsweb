@@ -32,7 +32,7 @@ public partial class SubmissionWindows
 
                 new(submissionwindow => submissionwindow.StartingDate + " _ " + submissionwindow.EndingDate, L["StartDate - EndDate"], "StartDate - EndDate"),
 
-                new(submissionwindow => DateTime.Now >= submissionwindow.StartingDate && DateTime.Now <= submissionwindow.EndingDate ? "Current" : "Previous", L["Status"], "Status"),
+                new(submissionwindow => DateTime.Now >= submissionwindow.StartingDate && DateTime.Now <= submissionwindow.EndingDate ? "Current" : DateTime.Now < submissionwindow.StartingDate && DateTime.Now < submissionwindow.EndingDate? "Ahead" : "Previous", L["Status"], "Status"),
 
                 new(submissionwindow => submissionwindow.IsLocked, L["IsLocked"], "IsLocked"),
             },
@@ -48,6 +48,9 @@ public partial class SubmissionWindows
             },
             createFunc: async prod =>
             {
+                var submissionwindowMonth = (SubmissionWindowMonthEnum)Enum.Parse(typeof(SubmissionWindowMonthEnum), prod.SubmissionWindowMonth);
+                prod.Month = (int) submissionwindowMonth;
+                prod.Year = int.Parse(prod.SubmissionWindowYear);
                 await SubmissionWindowClient.AddSubmissionWindowAsync("1", prod.Adapt<CreateSubmissionWindowRequest>());
             },
             updateFunc: async (id, prod) =>
@@ -104,14 +107,14 @@ public partial class SubmissionWindows
 
 public class SubmissionWindowViewModel
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; }
+    //public Guid Id { get; set; }
+    //public string Name { get; set; }
     public int Month { get; set; }
     public string SubmissionWindowMonth { get; set; }
     public int Year { get; set; }
     public string SubmissionWindowYear{ get; set; }
     public Guid ReportTypeId { get; set; }
-    public bool IsLocked { get; set; }
+    //public bool IsLocked { get; set; }
     public DateTime StartingDate { get; set; } = DateTime.Now.AddDays(1);
     public DateTime EndingDate { get; set; } = DateTime.Now.AddMonths(1);
 }
