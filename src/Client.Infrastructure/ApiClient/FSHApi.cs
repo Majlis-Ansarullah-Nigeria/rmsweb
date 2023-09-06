@@ -301,14 +301,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get a specific report type by id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetReportTypeAsync(System.Guid id);
+        System.Threading.Tasks.Task<ResultOfReportTypeDto> GetReportTypeAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
         /// Get a specific report type by id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetReportTypeAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ResultOfReportTypeDto> GetReportTypeAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
 
         /// <summary>
         /// update a specific report type.
@@ -630,7 +630,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get a specific report type by id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetReportTypeAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<ResultOfReportTypeDto> GetReportTypeAsync(System.Guid id)
         {
             return GetReportTypeAsync(id, System.Threading.CancellationToken.None);
         }
@@ -640,7 +640,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         /// Get a specific report type by id.
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetReportTypeAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResultOfReportTypeDto> GetReportTypeAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -656,6 +656,7 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -678,6 +679,16 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ResultOfReportTypeDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
                         if (status_ == 400)
                         {
                             var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
@@ -696,13 +707,6 @@ namespace rmsweb.Client.Infrastructure.ApiClient
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
-                        }
-                        else
-
-                        if (status_ == 200 || status_ == 204)
-                        {
-
-                            return;
                         }
                         else
                         {
@@ -6339,6 +6343,14 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ResultOfReportTypeDto : Result
+    {
+        [Newtonsoft.Json.JsonProperty("data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public ReportTypeDto Data { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class UpdateReportTypeRequest
     {
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -6570,9 +6582,6 @@ namespace rmsweb.Client.Infrastructure.ApiClient
         [Newtonsoft.Json.JsonProperty("isLocked", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool IsLocked { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("submissionOption", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public SubmissionOption SubmissionOption { get; set; }
-
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -6660,16 +6669,6 @@ namespace rmsweb.Client.Infrastructure.ApiClient
     {
         [Newtonsoft.Json.JsonProperty("triggeredOn", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime TriggeredOn { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.20.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum SubmissionOption
-    {
-
-        All = 1,
-
-        Selected = 2,
 
     }
 

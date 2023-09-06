@@ -12,18 +12,10 @@
 
     <EditFormContent>
         <MudItem xs="12" md="6">
-            <MudItem xs="12" md="6">
-                <MudSelect Margin="Margin.Dense" T="string" Label="Name" Variant="Variant.Text" For="@(() => context.Name)" @bind-Value="context.Name">
-                    @*@foreach (var item in @(() => GetAllReportTypesAsync)
-                    {
-                        <MudSelectItem Value="@i.ToString()">@i.ToString()</MudSelectItem>
-                    *@}
-                </MudSelect>
-
-            </MudItem>
+            <ReportTypeAutoComplete For="@(() => context.ReportTypeId)" @bind-Value="context.ReportTypeId" OffsetY="true" />
         </MudItem>
         <MudItem xs="12" md="6">
-            <MudSelect Margin="Margin.Dense" T="string" Label="Month" Variant="Variant.Text" For="@(() => context.SubmissionWindowMonth)">
+            <MudSelect Margin="Margin.Dense" T="string" Label="Month" Variant="Variant.Text" For="@(() => context.SubmissionWindowMonth)" @bind-Value="context.SubmissionWindowMonth">
                 @foreach (SubmissionWindowMonthEnum submissionwindow in Enum.GetValues(typeof(SubmissionWindowMonthEnum)))
                 {
                     <MudSelectItem Value="submissionwindow.ToString()">@submissionwindow.ToString()</MudSelectItem>
@@ -32,10 +24,12 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" md="6">
-            <MudSelect Margin="Margin.Dense" T="string" Label="Year" Variant="Variant.Text">
-                @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 100; i++)
+            <MudSelect Margin="Margin.Dense" T="string" Label="Year" Variant="Variant.Text" For="@(() => context.SubmissionWindowYear)" @bind-Value="context.SubmissionWindowYear">
+                <MudSelectItem Value="@DateTime.Now.Year.ToString()">@DateTime.Now.Year.ToString()</MudSelectItem>
+                @for (int i = 1; i <=  100; i++)
                 {
-                    <MudSelectItem Value="@i.ToString()">@i.ToString()</MudSelectItem>
+                    DateTime year = DateTime.Now.AddYears(i);
+                    <MudSelectItem Value="@year.Year.ToString()">@year.Year.ToString()</MudSelectItem>
                 }
             </MudSelect>
 

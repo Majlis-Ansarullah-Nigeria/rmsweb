@@ -25,23 +25,21 @@ public static class ApiHelper
         }
         catch (Exception ex)
         {
-           /* if (ex.Message is not null)
+            if (ex.Message is not null)
             {
-                customValidation?.DisplayErrors(ex.Message);
+                snackbar.Add(ex.Message, Severity.Error);
+               // customValidation?.DisplayErrors(ex.Message);
             }
             else
             {
                 snackbar.Add("Something went wrong!", Severity.Error);
-            }*/
+            }
         }
-       /* catch (Exception ex)
-        {
-            snackbar.Add(ex.Result.Exception, Severity.Error);
-        }
-        catch (Exception ex)
-        {
-            snackbar.Add(ex.Message, Severity.Error);
-        }*/
+ 
+        //catch (Exception ex)
+        //{
+        //    snackbar.Add(ex.Message, Severity.Error);
+        //}
 
         return default;
     }
