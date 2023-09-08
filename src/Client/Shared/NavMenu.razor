@@ -22,18 +22,24 @@
         @if (_canViewProducts)
         {
             <MudNavLink Href="/report-submission" Icon="@Icons.Filled.Report" Class="fsh-nav-child">
-                @L["Report Submission"]
+                @L["New Submission"]
+            </MudNavLink>
+            <MudNavLink Href="/submission-history" Icon="@Icons.Filled.History" Class="fsh-nav-child">
+                @L["Submission History"]
             </MudNavLink>
         }
     }
     @if (_canViewProducts || _canViewBrands)
     {
         <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 my-3">@L["Management"]</MudText>
-        <MudNavGroup Title="@L["Reports"]" Expanded Icon="@Icons.Filled.AddBox">
-        @if (_canViewProducts)
+        <MudNavGroup Title="@L["Reports Builder"]" Expanded Icon="@Icons.Filled.AddBox">
+            @if (_canViewProducts)
             {
                 <MudNavLink Href="/report/types" Icon="@Icons.Filled.Report" Class="fsh-nav-child">
-                    @L["Report Types"]
+                    @L["Manage Report Types"]
+                </MudNavLink>
+                <MudNavLink Href="/report/submissionwindows" Icon="@Icons.Filled.Apps" Class="fsh-nav-child">
+                    @L["Submission Window"]
                 </MudNavLink>
             }
         </MudNavGroup>

@@ -1,0 +1,102 @@
+﻿@page "/reportSubmission/{Id}"
+@*@attribute [MustHavePermission(FSHAction.View, FSHResource.UserRoles)]*@
+
+@inject IStringLocalizer<Submission> L
+
+<FshTitle Title="@L["Report Submission"]" Description="@L["Submit your report."]" />
+
+@if (!_loaded)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudTabs Elevation="25" Rounded="true" Centered="true" ApplyEffectsToContainer="true" AlwaysShowScrollButtons="true">
+        @foreach (var section in Report.Sections)
+        {
+            var allQuestionsInSection = section.Questions.ToList();
+            var title = section.Title;
+            var answeredQuestionsCount = section.Questions.Count(q => IsQuestionAnswered(q));
+            var badgeColor = answeredQuestionsCount == allQuestionsInSection.Count ? Color.Success : Color.Error;
+
+            <MudTabPanel Text="@title" BadgeData="@($"{answeredQuestionsCount}/{allQuestionsInSection.Count}")" BadgeColor="@badgeColor">
+
+            </MudTabPanel>
+        }
+    </MudTabs>
+
+    <div class="text-right mt-3">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveReport">
+            @L["Submit"]
+        </MudButton>
+    </div>
+
+}
+
+@code {
+    private ReportQuestionsModel Report { get; set; }
+    private bool _loaded = false;
+    [Inject]
+    protected ISectionQuestionClient Client { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GenerateMockDataAsync();
+        _loaded = true;
+    }
+
+    private async Task GenerateMockDataAsync()
+    {
+        await Task.Delay(1000); // Simulating delay for data retrieval
+        Guid type = new Guid("2d0d5733-5b43-485c-daee-08db7e658745");
+        var report = await Client.GetReportTypeQuestionsAsync(type, "1");
+        Report = report.Data;
+
+    }
+
+
+
+    public enum QuestionInputType
+    {
+        TextInput,
+        Checkbox,
+        Integer,
+        Dropdown,
+        Radio,
+        Date,
+        File
+    }
+
+    private void SaveSection(Sections section)
+    {
+        // Perform save operation for the specific section
+        // You can access the questions and answers using section.Questions
+        // Example: section.Questions[0].Answer
+    }
+
+    private void SaveReport()
+    {
+        // Perform save operation for the entire report
+        // You can access the sections, questions, and answers using Report.Sections
+        // Example: Report.Sections[0].Questions[0].Answer
+    }
+
+    private bool IsQuestionAnswered(ReportSectionQuestion question)
+    {
+        switch (question.ResponseType)
+        {
+            case ResponseType.Checkbox:
+                return true; // Checkbox type always considered answered
+            case ResponseType.Integer:
+            //  return question.AnswerInteger.HasValue;
+            default:
+                return !string.IsNullOrWhiteSpace(question.Text);
+                // return !string.IsNullOrWhiteSpace(question.Answer);
+        }
+    }
+
+    private void HandleFileUpload(/*IMudFileUploadEntry[] files*/)
+    {
+        // Handle file upload logic here
+    }
+}

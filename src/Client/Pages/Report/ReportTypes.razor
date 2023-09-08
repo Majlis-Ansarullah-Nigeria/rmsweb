@@ -5,8 +5,11 @@
 
 <FshTitle Title="@L["Reports"]" Description="@L["Manage Report Types."]" />
 
+<!-- Add the ReportTypeEnum definition here -->
+
 <EntityTable @ref="_table" TEntity="ReportTypeDto" TId="Guid" TRequest="ReportTypeViewModel" Context="@Context">
     <ExtraActions>
+        <MudMenuItem OnClick="(() => View(context))">@L["View Details"]</MudMenuItem>
         <MudMenuItem OnClick="(() => ManageReportSections(context.Id))">@L["Manage Report Type Sections"]</MudMenuItem>
     </ExtraActions>
 
@@ -18,9 +21,16 @@
             <MudTextField Label="@L["Description"]" For="@(() => context.Description)"
                 @bind-Value="context.Description" />
         </MudItem>
+        
+        <!-- Add the enum dropdown here -->
         <MudItem xs="12" md="6">
-            <MudTextField Label="@L["Report Tag"]" For="@(() => context.ReportTag)"
-            @bind-Value="context.ReportTag" />
+            <MudSelect Margin="Margin.Dense" T="string" Label="Report Tag" Variant="Variant.Text" For="@(() => context.ReportTagString)" @bind-Value="context.ReportTagString">
+                @foreach (ReportTypeEnum reportType in Enum.GetValues(typeof(ReportTypeEnum)))
+                {
+                    <MudSelectItem Value="reportType.ToString()">@reportType.ToString()</MudSelectItem>
+
+                }
+            </MudSelect>
         </MudItem>
     </EditFormContent>
 

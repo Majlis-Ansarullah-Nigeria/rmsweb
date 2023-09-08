@@ -1,0 +1,47 @@
+﻿@page "/report/submissionwindows"
+@*@attribute [MustHavePermission(FSHAction.View, FSHResource.UserRoles)]*@
+
+@inject IStringLocalizer<SubmissionWindow> L
+
+<FshTitle Title="@L["SubmissionWindows"]" Description="@L["Submission Windows."]" />
+
+<EntityTable @ref="_table" TEntity="SubmissionWindowDto" TId="Guid" TRequest="SubmissionWindowViewModel" Context="@Context">
+    <ExtraActions>
+        @*<MudMenuItem OnClick="(() => ManageReportSections(context.Id))">@L["Manage Report Type Sections"]</MudMenuItem>*@
+    </ExtraActions>
+
+    <EditFormContent>
+        <MudItem xs="12" md="6">
+            <ReportTypeAutoComplete For="@(() => context.ReportTypeId)" @bind-Value="context.ReportTypeId" OffsetY="true" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudSelect Margin="Margin.Dense" T="string" Label="Month" Variant="Variant.Text" For="@(() => context.SubmissionWindowMonth)" @bind-Value="context.SubmissionWindowMonth">
+                @foreach (SubmissionWindowMonthEnum submissionwindow in Enum.GetValues(typeof(SubmissionWindowMonthEnum)))
+                {
+                    <MudSelectItem Value="submissionwindow.ToString()">@submissionwindow.ToString()</MudSelectItem>
+
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudSelect Margin="Margin.Dense" T="string" Label="Year" Variant="Variant.Text" For="@(() => context.SubmissionWindowYear)" @bind-Value="context.SubmissionWindowYear">
+                <MudSelectItem Value="@DateTime.Now.Year.ToString()">@DateTime.Now.Year.ToString()</MudSelectItem>
+                @for (int i = 1; i <=  100; i++)
+                {
+                    DateTime year = DateTime.Now.AddYears(i);
+                    <MudSelectItem Value="@year.Year.ToString()">@year.Year.ToString()</MudSelectItem>
+                }
+            </MudSelect>
+
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField Label="@L["Start Date (format: mm/dd/yyy)"]" For="@(() => context.StartingDate)"
+            @bind-Value="context.StartingDate" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField Label="@L["End Date (format: mm/dd/yyy)"]" For="@(() => context.EndingDate)"
+            @bind-Value="context.EndingDate" />
+        </MudItem>
+    </EditFormContent>
+
+</EntityTable>
