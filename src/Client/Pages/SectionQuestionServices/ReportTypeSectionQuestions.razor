@@ -1,0 +1,32 @@
+﻿@page "/reportquestion/{ReportTypeSectionId}"
+@*@attribute [MustHavePermission(FSHAction.View, FSHResource.Questions)]*@
+
+@inject IStringLocalizer<ReportTypeSectionQuestions> L
+
+<FshTitle Title="@L["Questions"]" Description="@L["Manage Report Section QUestions"]" />
+
+<EntityTable TEntity="QuestionDto" TId="Guid" TRequest="ReportQuestionRequest" Context="@Context" >
+    <ExtraActions>
+
+        <MudMenuItem OnClick="(() => EditQuestion(context.Id))">@L["View Profile"]</MudMenuItem>
+
+    </ExtraActions>
+
+    <EditFormContent>
+        <MudItem xs="12" md="6">
+            <MudTextField For="@(() => context.Text)" @bind-Value="context.Text" Label="@L["Text"]" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudTextField For="@(() => context.Points)" @bind-Value="context.Points" Label="@L["Points"]" />
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudSelect @bind-Value="context.ResponseType" Label="Select Response Type" HelperText="Enum" OpenIcon="@Icons.Material.Filled.Flag">
+                @foreach (QuestionInputType item in Enum.GetValues(typeof(QuestionInputType)))
+                {
+                    <MudSelectItem Value="@item">@item</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </EditFormContent>
+
+</EntityTable>
