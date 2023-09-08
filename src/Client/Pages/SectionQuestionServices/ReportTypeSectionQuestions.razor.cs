@@ -24,7 +24,7 @@ public partial class ReportTypeSectionQuestions
     public string ReportTypeSectionId { get; set; } = default!;
 
     [Inject]
-    protected ISectionQuestionServicesClient SectionQuestionServicesClient { get; set; } = default!;
+    protected ISectionQuestionClient SectionQuestionClient { get; set; } = default!;
 
     protected EntityServerTableContext<QuestionDto, Guid, ReportQuestionRequest> Context { get; set; } = default!;
 
@@ -50,15 +50,18 @@ public partial class ReportTypeSectionQuestions
 
             },
             hasExtraActionsFunc: () => true,
-            canUpdateEntityFunc: e => false,
-            createAction: string.Empty,
-            canDeleteEntityFunc: e => false,
             searchFunc: async filter =>
             {
                // var returnObject = new PaginationResponse<ReportQuestionsModel>();
-                var result = await SectionQuestionServicesClient.GetSectionQuestionsBySectionIdAsync(Guid.Parse(ReportTypeSectionId), "1");
+                var result = await SectionQuestionClient.GetSectionQuestionsBySectionIdAsync(Guid.Parse(ReportTypeSectionId), "1");
                 return result.Adapt<PaginationResponse<QuestionDto>>();
             },
+             createFunc: async prod =>
+             {
+                 var SectionId = Guid.Parse(ReportTypeSectionId);
+                 prod.SectionId = SectionId;
+                 await SectionQuestionClient.AddQuestionAsync("1", prod.Adapt<ReportQuestionRequest>());
+             },
             exportAction: string.Empty);
 
     }

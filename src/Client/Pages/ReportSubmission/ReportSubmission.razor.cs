@@ -45,8 +45,10 @@
 //           canUpdateEntityFunc: e => false,
 //           searchFunc: async (filter) =>
 //           {
-//               /* var cardRequestFilter = filter.Adapt<GetAllPrintedCardRequests>();
-//                var result = await CardRequestsClient.GetPrintedCardRequestAsync(cardRequestFilter);*/
+
+//              /* var cardRequestFilter = filter.Adapt<GetAllPrintedCardRequests>();
+//               var result = await CardRequestsClient.GetPrintedCardRequestAsync(cardRequestFilter);*/
+
 //               return new();
 //           }
 //          /* deleteFunc: async id => await DilasClient.DeleteAsync(id)*/);
