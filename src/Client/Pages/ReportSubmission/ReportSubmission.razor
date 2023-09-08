@@ -18,11 +18,11 @@
         <MudItem xs="12" md="6">
             <MudItem xs="12" md="6">
                 <MudSelect Margin="Margin.Dense" T="string" Label="Name" Variant="Variant.Text" For="@(() => context.Name)" @bind-Value="context.Name">
-                    @*@foreach (var item in @(() => GetAllReportTypesAsync)
+                    @foreach (var item in @(() => GetAllReportTypesAsync)
                     {
                     <MudSelectItem Value="@i.ToString()">@i.ToString()</MudSelectItem>
-                    *@}
-                </MudSelect>
+                    }
+             @*   </MudSelect>
 
             </MudItem>
         </MudItem>
@@ -54,4 +54,4 @@
         </MudItem>
     </EditFormContent>
 
-</EntityTable>
+</EntityTable>*@
