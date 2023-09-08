@@ -7,7 +7,7 @@
 
 <EntityTable @ref="_table" TEntity="ReportTypeSectionDto" TId="Guid" TRequest="ReportTypeSectionViewModel" Context="@Context">
     <ExtraActions>
-        @*<MudMenuItem OnClick="(() => ManageReportSections(context.Id))">@L["Manage Report Type Sections"]</MudMenuItem>*@
+        <MudMenuItem OnClick="(() => ViewReportTypeSectionQuestions(context.Id))">@L["Manage Section Questions"]</MudMenuItem>
     </ExtraActions>
 
     <EditFormContent>

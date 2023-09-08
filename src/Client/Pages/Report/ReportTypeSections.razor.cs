@@ -86,8 +86,8 @@ public partial class ReportTypeSections
         }
     }
 
-    //private void ViewReport(in Guid reportTypeId) =>
-    //   Navigation.NavigateTo($"/reportTypes/{reportTypeId}");
+    private void ViewReportTypeSectionQuestions(in Guid ReportTypeSectionId) =>
+      Navigation.NavigateTo($"/reportquestion/{ReportTypeSectionId}");
 
     //private void ManageReportSections(in Guid reportTypeId) =>
     //    Navigation.NavigateTo($"/reportTypes/{reportTypeId}/sections");
